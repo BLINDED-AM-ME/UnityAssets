@@ -1,0 +1,74 @@
+
+Ver 1: April 25, 2016
+
+	init
+
+Ver 2: May 8, 2016
+
+	+Trail_Mesh.cs
+	+Trail_Path.cs
+
+       July 13 + fixed: Trail_Path.cs issue with last point’s up direction
+
+Ver 3: July 14, 2016
+
+	+BlendFiles.folder
+	+_2D.folder
+	+_ScriptHelper.folder
+
+	+Spline2D.cs
+	+AdjustableQuad2D.cs
+
+Ver 4: Oct 8, 2016
+
+	some cleaning up
+
+	Trail_Path.cs -> Path_Comp.cs
+	+Mesh_Maker.cs
+	LightningPath.cs -> Electricity.cs
+	LightningStrike.cs -> Bolt.cs
+
+	+tangent support for making meshes
+		Trail_Mesh.cs
+		MeshCut.cs
+
+	Oct 14, 2016
+
+	+DiffuseOultine.shader
+	+CelShaded_ShadowDetails.shader
+
+	Oct 20, 2016
+
+	SaveData.cs now has xml option
+
+Ver 5: Oct 27, 2016
+
+	+MeshColliderPerMaterial.cs
+	+ExampleUseof_MeshColliderPeMaterial.cs
+	
+	Mesh_Maker.cs fix at line 151
+
+Ver 6: Jan 19, 2017
+
+	+ParticleTexture.cs
+
+	Jan 31, 2017
+
+	+Hexagon_AlphaTexture.png
+	+Hexagon_Bump.png
+
+	+SetDepthTextureMode.cs
+
+	+Diffuse_UnlitRimColor.shader
+	+DiffuseBumped_UnlitRimColorBumped.shader
+	+Intersection_Color.shader
+	+Intersection_Color_Rim.shader
+	+Intersection_Color_Rim_Bumped.shader
+	+Intersection_Texture.shader
+	+Intersection_Texture_Rim.shader
+	+Intersection_Texture_Rim_Bumped.shader
+
+	DiffuseOultine.shader -> Diffuse_Outline_Edges.shader
+
+
+
