@@ -70,5 +70,10 @@ Ver 6: Jan 19, 2017
 
 	DiffuseOultine.shader -> Diffuse_Outline_Edges.shader
 
+	April 20, 2017
+
+	MeshCut.cs added if(final_verts[0] != final_verts[1] && final_verts[0] != final_verts[2])
+
+
 
 
