@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/BlendFile_objects.unity
+    guid: 95f86fb55e9894a87959cac39e86854d
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Burn_Through.unity
+    guid: 79aaae73811e449f5ab82f5b81347b0b
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/CelShaded_ShadowDetails.unity
+    guid: 555b96d12518c4c4f9115c7dd9462bd5
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Clipping.unity
+    guid: 4ede9cf8ca53246dc93f9b3707fef07d
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/IntersectionShader.unity
+    guid: ec84ea74286224c4cb046db8377607db
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Lightning - Click Play.unity
+    guid: 0b559f7bc53584d9da78c4452b74ae9a
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Mesh_Cut - Play, click cube.unity
+    guid: 11d928b7f36024f079bef9251b5cdca5
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/MeshColliderPerMaterial.unity
+    guid: 839acc62e9c074d9cb16dfcd946321d6
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Parallax2D background.unity
+    guid: 1d70442b5d7ad4ad68b7ccc19b4abf6b
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Parallax2D_box.unity
+    guid: fff13ccc0e51549ffb87f06432b126e2
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Particle_Flow.unity
+    guid: 0a9ba26a50123444b9379a9aefa64780
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/ParticleTexture.unity
+    guid: 71c395ded1004448eab4520c528af76c
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Portal.unity
+    guid: b740043a9f0474d51aad49057ff54b00
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Save_Data.unity
+    guid: e97b9f1769b88417590f222f3eb5095d
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Spline2D.unity
+    guid: 5d91f16760e7b4f4897b4f6c9cb549b0
+  - enabled: 1
+    path: Assets/BLINDED_AM_ME package/Scenes/Spline3D.unity
+    guid: 12a724064c20e4f7495385e1e5a2f7cc
