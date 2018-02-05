@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Dual_Textured_Bumbed
+  m_Shader: {fileID: 4800000, guid: 689173ef602e04b928e5856cc6ffd2ff, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: b9c015840faca44d589f53ff407bb760, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: b42ba42d56d3341cf986626592526f59, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SecondTex:
+        m_Texture: {fileID: 2800000, guid: 1361e18e8176043e9934d63db6b7b70a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Stencil:
+        m_Texture: {fileID: 2800000, guid: 286aa924424c34c1a89f9b5ef480a413, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex1:
+        m_Texture: {fileID: 2800000, guid: 48dc80be8f3f244628e87b64319da9b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex2:
+        m_Texture: {fileID: 2800000, guid: b5a9924878b3649a1bf8e8bcde4bfe24, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex3:
+        m_Texture: {fileID: 2800000, guid: 1361e18e8176043e9934d63db6b7b70a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _Emission1: 0
+    - _Emission2: 0
+    - _Fade1: 1
+    - _Fade2: 1
+    - _FirstEmission: 0
+    - _FirstFade: 1
+    - _Glossiness: 0.5
+    - _Metallic: 0
+    - _MoveFirstX: 0
+    - _MoveFirstY: 0
+    - _MoveSecondX: 0
+    - _MoveSecondY: 0
+    - _MoveStencilX: 0
+    - _MoveStencilY: 0
+    - _MoveX1: 0
+    - _MoveX2: 0
+    - _MoveX3: 0
+    - _MoveY1: 0
+    - _MoveY2: 0
+    - _MoveY3: 0
+    - _SecondEmission: 0
+    - _SecondFade: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color1: {r: 1, g: 1, b: 1, a: 1}
+    - _Color2: {r: 1, g: 1, b: 1, a: 1}
+    - _SecondColor: {r: 1, g: 1, b: 1, a: 1}
