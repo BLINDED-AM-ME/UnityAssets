@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4465791, g: 0.4964131, b: 0.5748148, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657892, g: 0.49641287, b: 0.57481444, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -191,7 +191,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 241848677}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 1.3792075, z: -0.74}
+  m_LocalPosition: {x: 1.88, y: 1, z: 1.012}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -255,8 +255,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 434396251}
-  m_LocalRotation: {x: -0.000000039345114, y: -0.9704012, z: 0.24149857, w: -0.00000015809843}
-  m_LocalPosition: {x: 5.999998, y: 1.9399999, z: 5.5500016}
+  m_LocalRotation: {x: 0.013314063, y: -0.9835008, z: 0.16104716, w: 0.081319}
+  m_LocalPosition: {x: 6.911875, y: 1.7883455, z: 5.4765487}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 456618148}
@@ -294,8 +294,8 @@ MonoBehaviour:
   pointB: {fileID: 1802624566}
   scoutCamera: {fileID: 434396252}
   faceNormal: {x: 0, y: 0, z: 1}
-  m_TextureSize: 512
-  m_ClipPlaneOffset: 0.07
+  portalTextureSize: 512
+  clipPlaneOffset: 0.07
 --- !u!23 &456618146
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -343,14 +343,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 456618144}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: -0.00000016292068}
-  m_LocalPosition: {x: 2, y: 1.08, z: -1.61}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 2, y: 1.08, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 434396253}
   m_Father: {fileID: 0}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &1196376370
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,8 +425,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1196376370}
-  m_LocalRotation: {x: 0.24149854, y: 0, z: 0, w: 0.9704012}
-  m_LocalPosition: {x: 0, y: 3.02, z: -7.16}
+  m_LocalRotation: {x: 0.08703132, y: 0.8006673, z: -0.120027825, w: 0.58047473}
+  m_LocalPosition: {x: -2.596792, y: 1.8380566, z: 0.8496069}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -605,8 +605,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1576164161}
-  m_LocalRotation: {x: -0.000000039345114, y: -0.9704012, z: 0.24149857, w: -0.00000015809843}
-  m_LocalPosition: {x: -6.000002, y: 1.9399999, z: 5.549998}
+  m_LocalRotation: {x: 0.013314063, y: -0.9835008, z: 0.16104716, w: 0.081319}
+  m_LocalPosition: {x: -5.088125, y: 1.7883455, z: 5.4765487}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1802624566}
@@ -672,14 +672,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1802624565}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: -0.00000016292068}
-  m_LocalPosition: {x: -2, y: 1.08, z: -1.61}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: -2, y: 1.08, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1576164162}
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &1802624567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -694,8 +694,8 @@ MonoBehaviour:
   pointB: {fileID: 456618148}
   scoutCamera: {fileID: 1576164163}
   faceNormal: {x: 0, y: 0, z: 1}
-  m_TextureSize: 1024
-  m_ClipPlaneOffset: 0.07
+  portalTextureSize: 512
+  clipPlaneOffset: 0.07
 --- !u!23 &1802624568
 MeshRenderer:
   m_ObjectHideFlags: 0
