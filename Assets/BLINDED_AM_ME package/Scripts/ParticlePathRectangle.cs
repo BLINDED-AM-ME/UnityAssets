@@ -36,53 +36,52 @@ namespace BLINDED_AM_ME{
 
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(ParticleSystem))]
-	[RequireComponent(typeof(Path_Comp))]
-	public class ParticlePathFlow : MonoBehaviour {
+	public class ParticlePathRectangle : MonoBehaviour {
 
-		public bool isPathUpdating = false;
+		public bool isSmooth = false;
+		public bool isFlat   = true;
 		public bool hasRandomStartingPoints = false;
-
 
 		[Range(0.0f, 5.0f)]
 		public float pathWidth = 0.0f;
 
+		public Vector2 rectangleSize = new Vector2(10.0f, 5.0f);
+		public bool    isRectangleSizeUpdating = false;
 
 		private ParticleSystem.Particle[] _particle_array;
 		private ParticleSystem            _particle_system;
-		private Path_Comp 				  _path_comp;
+		private Path                      _path = new Path();
 
 		private int _numParticles;
 
 
-	#if UNITY_EDITOR
+		#if UNITY_EDITOR
 		void Reset(){
 			Start();
 		}
-	#endif
-	
+
+		void OnValidate(){
+			Calculate_The_Four_Corners();
+		}
+		#endif
+
 		void Start(){
-			
-			_path_comp = GetComponent<Path_Comp>();
+
 			_particle_system = GetComponent<ParticleSystem>();
 			_particle_array = new ParticleSystem.Particle[_particle_system.main.maxParticles];
+
+			Calculate_The_Four_Corners();
 
 		}
 
 
 		void LateUpdate () {
 
-			if(_particle_array == null){
-			
+			if(_particle_array == null)
 				Start();
-				_path_comp.Update_Path();
-			
-			}else if(isPathUpdating){
 
-				_path_comp.Update_Path();
-
-			}
-
-
+			if(isRectangleSizeUpdating)
+				Calculate_The_Four_Corners();
 
 			_numParticles = _particle_system.GetParticles(_particle_array);
 
@@ -98,7 +97,7 @@ namespace BLINDED_AM_ME{
 						normalizedLifetime = normalizedLifetime % 1.0f;
 					}
 
-					Path_Point axis = _path_comp.GetPathPoint(_path_comp.TotalDistance * normalizedLifetime);
+					Path_Point axis = _path.GetPathPoint(_path.TotalDistance * normalizedLifetime, isSmooth);
 					Vector2    offset = Vector2.zero;
 
 					if(pathWidth > 0){
@@ -107,22 +106,68 @@ namespace BLINDED_AM_ME{
 					}
 
 					_particle_array[i].position = axis.point + 
-						(axis.right * offset.x) +
-						(axis.up    * offset.y);
-					
+						(isFlat ? Vector3.zero :  axis.right * offset.x) +
+						(                         axis.up    * offset.y);
+
 					_particle_array[i].velocity = axis.forward * _particle_array[i].velocity.magnitude;
 
 				}
-					
+
 				_particle_system.SetParticles(_particle_array, _numParticles);
 
 			}
 
 
-		}		
+		}
 
 		private float Get_Value_From_Random_Seed_0t1(float seed, float converter){
 			return (seed % converter) / converter;
+		}
+
+
+		private void Calculate_The_Four_Corners(){
+
+			_path.SetPoints(
+				new Vector3[]{
+					(-Vector3.right * (rectangleSize.x * 0.5f)) + ( -Vector3.up * (rectangleSize.y * 0.5f)),
+					(-Vector3.right * (rectangleSize.x * 0.5f)) + (  Vector3.up * (rectangleSize.y * 0.5f)),
+					( Vector3.right * (rectangleSize.x * 0.5f)) + (  Vector3.up * (rectangleSize.y * 0.5f)),
+					( Vector3.right * (rectangleSize.x * 0.5f)) + ( -Vector3.up * (rectangleSize.y * 0.5f))
+				},
+				new Vector3[]{
+					Vector3.Lerp(-Vector3.right,-Vector3.up, 0.5f),
+					Vector3.Lerp(-Vector3.right, Vector3.up, 0.5f),
+					Vector3.Lerp( Vector3.right, Vector3.up, 0.5f),
+					Vector3.Lerp( Vector3.right,-Vector3.up, 0.5f)
+				},
+				true);
+
+		}
+			
+
+
+		private void OnDrawGizmosSelected()
+		{
+
+			Gizmos.color = Color.yellow;
+			Gizmos.DrawLine(
+				transform.TransformPoint((-Vector3.right * (rectangleSize.x * 0.5f)) + (-Vector3.up * (rectangleSize.y * 0.5f))),
+				transform.TransformPoint((-Vector3.right * (rectangleSize.x * 0.5f)) + ( Vector3.up * (rectangleSize.y * 0.5f)))
+			);
+			Gizmos.DrawLine(
+				transform.TransformPoint((-Vector3.right * (rectangleSize.x * 0.5f)) + ( Vector3.up * (rectangleSize.y * 0.5f))),
+				transform.TransformPoint(( Vector3.right * (rectangleSize.x * 0.5f)) + ( Vector3.up * (rectangleSize.y * 0.5f)))
+			);
+			Gizmos.DrawLine(
+				transform.TransformPoint(( Vector3.right * (rectangleSize.x * 0.5f)) + ( Vector3.up * (rectangleSize.y * 0.5f))),
+				transform.TransformPoint(( Vector3.right * (rectangleSize.x * 0.5f)) + (-Vector3.up * (rectangleSize.y * 0.5f)))
+			);
+			Gizmos.DrawLine(
+				transform.TransformPoint(( Vector3.right * (rectangleSize.x * 0.5f)) + (-Vector3.up * (rectangleSize.y * 0.5f))),
+				transform.TransformPoint((-Vector3.right * (rectangleSize.x * 0.5f)) + (-Vector3.up * (rectangleSize.y * 0.5f)))
+			);
+
+
 		}
 
 	}
