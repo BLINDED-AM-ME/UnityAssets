@@ -55,8 +55,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isSmooth: 0
   isFlat: 1
-  hasRandomStartingPoints: 0
-  pathWidth: 0
+  hasRandomStartingPoints: 1
+  pathWidth: 1.43
   rectangleSize: {x: 20, y: 10}
   isRectangleSizeUpdating: 0
 --- !u!198 &198301975376246578
@@ -119,15 +119,15 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -977377937
+  randomSeed: -214482701
   InitialModule:
     serializedVersion: 3
     enabled: 1
     startLifetime:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 10
-      minScalar: 15
+      minMaxState: 3
+      scalar: 5
+      minScalar: 2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -166,9 +166,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startSpeed:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0
-      minScalar: 5
+      minMaxState: 3
+      scalar: 3
+      minScalar: 1
       maxCurve:
         serializedVersion: 2
         m_Curve:
