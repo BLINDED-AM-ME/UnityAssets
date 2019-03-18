@@ -1,4 +1,4 @@
-﻿
+
 //    MIT License
 //    
 //    Copyright (c) 2017 Dustin Whirle
@@ -66,6 +66,11 @@ namespace BLINDED_AM_ME{
 			int[] indices;
 			int   p1,p2,p3;
 
+			var vertices = _victim_mesh.vertices;
+			var normals = _victim_mesh.normals;
+			var uv = _victim_mesh.uv;
+			var tangents = _victim_mesh.tangents;
+
 			// go throught the submeshes
 			for(int sub=0; sub<_victim_mesh.subMeshCount; sub++){
 
@@ -77,9 +82,9 @@ namespace BLINDED_AM_ME{
 					p2 = indices[i+1];
 					p3 = indices[i+2];
 
-					sides[0] = _blade.GetSide(_victim_mesh.vertices[p1]);
-					sides[1] = _blade.GetSide(_victim_mesh.vertices[p2]);
-					sides[2] = _blade.GetSide(_victim_mesh.vertices[p3]);
+					sides[0] = _blade.GetSide(vertices[p1]);
+					sides[1] = _blade.GetSide(vertices[p2]);
+					sides[2] = _blade.GetSide(vertices[p3]);
 
 
 					// whole triangle
@@ -88,28 +93,28 @@ namespace BLINDED_AM_ME{
 						if(sides[0]){ // left side
 
 							_leftSide.AddTriangle(
-								new Vector3[]{ _victim_mesh.vertices[p1], _victim_mesh.vertices[p2], _victim_mesh.vertices[p3] },
-								new Vector3[]{ _victim_mesh.normals[p1],  _victim_mesh.normals[p2],  _victim_mesh.normals[p3] },
-								new Vector2[]{ _victim_mesh.uv[p1],       _victim_mesh.uv[p2],       _victim_mesh.uv[p3] },
-								new Vector4[]{ _victim_mesh.tangents[p1], _victim_mesh.tangents[p2], _victim_mesh.tangents[p3] },
+								new Vector3[]{ vertices[p1], vertices[p2], vertices[p3] },
+								new Vector3[]{ normals[p1],  normals[p2],  normals[p3] },
+								new Vector2[]{ uv[p1],       uv[p2],       uv[p3] },
+								new Vector4[]{ tangents[p1], tangents[p2], tangents[p3] },
 								sub);
 						}else{
 
 							_rightSide.AddTriangle(
-								new Vector3[]{ _victim_mesh.vertices[p1], _victim_mesh.vertices[p2], _victim_mesh.vertices[p3] },
-								new Vector3[]{ _victim_mesh.normals[p1],  _victim_mesh.normals[p2],  _victim_mesh.normals[p3] },
-								new Vector2[]{ _victim_mesh.uv[p1],       _victim_mesh.uv[p2],       _victim_mesh.uv[p3] },
-								new Vector4[]{ _victim_mesh.tangents[p1], _victim_mesh.tangents[p2], _victim_mesh.tangents[p3] },
+								new Vector3[]{ vertices[p1], vertices[p2], vertices[p3] },
+								new Vector3[]{ normals[p1],  normals[p2],  normals[p3] },
+								new Vector2[]{ uv[p1],       uv[p2],       uv[p3] },
+								new Vector4[]{ tangents[p1], tangents[p2], tangents[p3] },
 								sub);
 						}
 
 					}else{ // cut the triangle
 						
 						Cut_this_Face(
-							new Vector3[]{ _victim_mesh.vertices[p1], _victim_mesh.vertices[p2], _victim_mesh.vertices[p3] },
-							new Vector3[]{ _victim_mesh.normals[p1],  _victim_mesh.normals[p2],  _victim_mesh.normals[p3] },
-							new Vector2[]{ _victim_mesh.uv[p1],       _victim_mesh.uv[p2],       _victim_mesh.uv[p3] },
-							new Vector4[]{ _victim_mesh.tangents[p1], _victim_mesh.tangents[p2], _victim_mesh.tangents[p3] },
+							new Vector3[]{ vertices[p1], vertices[p2], vertices[p3] },
+							new Vector3[]{ normals[p1],  normals[p2],  normals[p3] },
+							new Vector2[]{ uv[p1],       uv[p2],       uv[p3] },
+							new Vector4[]{ tangents[p1], tangents[p2], tangents[p3] },
 							sub);
 					}
 				}
