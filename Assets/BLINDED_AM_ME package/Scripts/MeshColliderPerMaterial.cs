@@ -54,10 +54,10 @@ namespace BLINDED_AM_ME{
 
 					maker.AddTriangle(new Vector3[]{
 						_mesh.vertices[trinagles[i]], _mesh.vertices[trinagles[i+1]], _mesh.vertices[trinagles[i+2]]
-					}, new Vector3[]{
-						_mesh.normals[trinagles[i]], _mesh.normals[trinagles[i+1]], _mesh.normals[trinagles[i+2]]
 					}, new Vector2[]{
 						_mesh.uv[trinagles[i]], _mesh.uv[trinagles[i+1]], _mesh.uv[trinagles[i+2]]
+					}, new Vector3[]{
+						_mesh.normals[trinagles[i]], _mesh.normals[trinagles[i+1]], _mesh.normals[trinagles[i+2]]
 					},0);
 				}
 

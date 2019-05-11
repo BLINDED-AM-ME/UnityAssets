@@ -196,7 +196,7 @@ namespace BLINDED_AM_ME{
 
 			}
 
-			_maker.AddTriangle(verts, norms, uvs, tangents, submesh);
+			_maker.AddTriangle(verts, uvs, norms, tangents, submesh);
 
 		}
 

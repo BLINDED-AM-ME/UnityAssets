@@ -3,11 +3,11 @@
 //    
 //    Copyright (c) 2017 Dustin Whirle
 //    
-//    My Youtube stuff: https://www.youtube.com/playlist?list=PL-sp8pM7xzbVls1NovXqwgfBQiwhTA_Ya
+//    My Yrefube stuff: https://www.yrefube.com/playlist?list=PL-sp8pM7xzbVls1NovXqwgfBQiwhTA_Ya
 //    
 //    Permission is hereby granted, free of charge, to any person obtaining a copy
 //    of this software and associated documentation files (the "Software"), to deal
-//    in the Software without restriction, including without limitation the rights
+//    in the Software withref restriction, including withref limitation the rights
 //    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //    copies of the Software, and to permit persons to whom the Software is
 //    furnished to do so, subject to the following conditions:
@@ -15,12 +15,12 @@
 //    The above copyright notice and this permission notice shall be included in all
 //    copies or substantial portions of the Software.
 //    
-//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHref WARRANTY OF ANY KIND, EXPRESS OR
 //    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 //    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 //    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//    ref OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //    SOFTWARE.
 
 using UnityEngine;
@@ -30,24 +30,28 @@ using System.Collections.Generic;
 namespace BLINDED_AM_ME{
 
 	public class MeshCut{
-
-		private static Mesh_Maker _leftSide = new Mesh_Maker();
-		private static Mesh_Maker _rightSide = new Mesh_Maker();
-
-
+        
 		private static Plane _blade;
 		private static Mesh  _victim_mesh;
 
-		// capping stuff
-		private static List<Vector3> _new_vertices = new List<Vector3>();
-
-		private static int _capMatSub = 1;
-
-		/// <summary>
-		/// Cut the specified victim
-		/// </summary>
-		public static GameObject[] Cut(GameObject victim, Vector3 anchorPoint, Vector3 normalDirection, Material capMaterial){
-
+        // Caching
+        private static Mesh_Maker _leftSide = new Mesh_Maker();
+		private static Mesh_Maker _rightSide = new Mesh_Maker();
+        private static Mesh_Maker.Triangle _cacheTriangle = new Mesh_Maker.Triangle( new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3] );
+        private static List<Vector3>       _newVertices = new List<Vector3>();
+        private static bool[]              _isLeftSideCache = new bool[3];
+        private static int                 _capMatSub = 1;
+       
+        /// <summary>
+        /// Yeah
+        /// </summary>
+        /// <param name="victim">self discribed</param>
+        /// <param name="anchorPoint">blade world position</param>
+        /// <param name="normalDirection">blade right direction</param>
+        /// <param name="capMaterial">Meat</param>
+        /// <returns></returns>
+        public static GameObject[] Cut(GameObject victim, Vector3 anchorPoint, Vector3 normalDirection, Material capMaterial){
+           
 			// set the blade relative to victim
 			_blade = new Plane(victim.transform.InverseTransformDirection(-normalDirection),
 				victim.transform.InverseTransformPoint(anchorPoint));
@@ -55,62 +59,69 @@ namespace BLINDED_AM_ME{
 			// get the victims mesh
 			_victim_mesh = victim.GetComponent<MeshFilter>().mesh;
 
-			// reset values
-			_new_vertices.Clear();
+            // two new meshes
+            _leftSide.Clear();
+            _rightSide.Clear();
+            _newVertices.Clear();
 
-			_leftSide  = new Mesh_Maker();
-			_rightSide = new Mesh_Maker();
+            
+			int   index_1, index_2, index_3;
 
+            var mesh_vertices = _victim_mesh.vertices;
+            var mesh_normals  = _victim_mesh.normals;
+            var mesh_uvs      = _victim_mesh.uv;
+            var mesh_tangents = _victim_mesh.tangents;
 
-			bool[] sides = new bool[3];
-			int[] indices;
-			int   p1,p2,p3;
+			// go through the submeshes
+			for (int submeshIterator=0; submeshIterator<_victim_mesh.subMeshCount; submeshIterator++){
 
-			// go throught the submeshes
-			for(int sub=0; sub<_victim_mesh.subMeshCount; sub++){
-
-				indices = _victim_mesh.GetTriangles(sub);
-
+                // Triangles
+				var indices = _victim_mesh.GetTriangles(submeshIterator);
+                
 				for(int i=0; i<indices.Length; i+=3){
 
-					p1 = indices[i];
-					p2 = indices[i+1];
-					p3 = indices[i+2];
+					index_1 = indices[i];
+					index_2 = indices[i+1];
+					index_3 = indices[i+2];
 
-					sides[0] = _blade.GetSide(_victim_mesh.vertices[p1]);
-					sides[1] = _blade.GetSide(_victim_mesh.vertices[p2]);
-					sides[2] = _blade.GetSide(_victim_mesh.vertices[p3]);
+                    // verts
+                    _cacheTriangle.vertices[0] = mesh_vertices[index_1];
+                    _cacheTriangle.vertices[1] = mesh_vertices[index_2];
+                    _cacheTriangle.vertices[2] = mesh_vertices[index_3];
 
+                    // normals
+                    _cacheTriangle.normals[0] = mesh_normals[index_1];
+                    _cacheTriangle.normals[1] = mesh_normals[index_2];
+                    _cacheTriangle.normals[2] = mesh_normals[index_3];
+
+                    // uvs
+                    _cacheTriangle.uvs[0] = mesh_uvs[index_1];
+                    _cacheTriangle.uvs[1] = mesh_uvs[index_2];
+                    _cacheTriangle.uvs[2] = mesh_uvs[index_3];
+
+                    // tangents
+                    _cacheTriangle.tangents[0] = mesh_tangents[index_1];
+                    _cacheTriangle.tangents[1] = mesh_tangents[index_2];
+                    _cacheTriangle.tangents[2] = mesh_tangents[index_3];
+
+
+                    // which side are the vertices on
+                    _isLeftSideCache[0] = _blade.GetSide(mesh_vertices[index_1]);
+					_isLeftSideCache[1] = _blade.GetSide(mesh_vertices[index_2]);
+					_isLeftSideCache[2] = _blade.GetSide(mesh_vertices[index_3]);
+                    
 
 					// whole triangle
-					if(sides[0] == sides[1] && sides[0] == sides[2]){
+					if(_isLeftSideCache[0] == _isLeftSideCache[1] && _isLeftSideCache[0] == _isLeftSideCache[2]){
 
-						if(sides[0]){ // left side
-
-							_leftSide.AddTriangle(
-								new Vector3[]{ _victim_mesh.vertices[p1], _victim_mesh.vertices[p2], _victim_mesh.vertices[p3] },
-								new Vector3[]{ _victim_mesh.normals[p1],  _victim_mesh.normals[p2],  _victim_mesh.normals[p3] },
-								new Vector2[]{ _victim_mesh.uv[p1],       _victim_mesh.uv[p2],       _victim_mesh.uv[p3] },
-								new Vector4[]{ _victim_mesh.tangents[p1], _victim_mesh.tangents[p2], _victim_mesh.tangents[p3] },
-								sub);
-						}else{
-
-							_rightSide.AddTriangle(
-								new Vector3[]{ _victim_mesh.vertices[p1], _victim_mesh.vertices[p2], _victim_mesh.vertices[p3] },
-								new Vector3[]{ _victim_mesh.normals[p1],  _victim_mesh.normals[p2],  _victim_mesh.normals[p3] },
-								new Vector2[]{ _victim_mesh.uv[p1],       _victim_mesh.uv[p2],       _victim_mesh.uv[p3] },
-								new Vector4[]{ _victim_mesh.tangents[p1], _victim_mesh.tangents[p2], _victim_mesh.tangents[p3] },
-								sub);
-						}
+						if(_isLeftSideCache[0]) // left side
+							_leftSide.AddTriangle( _cacheTriangle, submeshIterator);
+						else // right side
+							_rightSide.AddTriangle(_cacheTriangle, submeshIterator);
 
 					}else{ // cut the triangle
 						
-						Cut_this_Face(
-							new Vector3[]{ _victim_mesh.vertices[p1], _victim_mesh.vertices[p2], _victim_mesh.vertices[p3] },
-							new Vector3[]{ _victim_mesh.normals[p1],  _victim_mesh.normals[p2],  _victim_mesh.normals[p3] },
-							new Vector2[]{ _victim_mesh.uv[p1],       _victim_mesh.uv[p2],       _victim_mesh.uv[p3] },
-							new Vector4[]{ _victim_mesh.tangents[p1], _victim_mesh.tangents[p2], _victim_mesh.tangents[p3] },
-							sub);
+						Cut_this_Face(ref _cacheTriangle, submeshIterator);
 					}
 				}
 			}
@@ -126,7 +137,7 @@ namespace BLINDED_AM_ME{
 			_capMatSub = mats.Length-1; // for later use
 
 			// cap the opennings
-			Capping();
+			Cap_the_Cut();
 
 
 			// Left Mesh
@@ -164,256 +175,343 @@ namespace BLINDED_AM_ME{
 
 		}
 
-		/// <summary>
-		///  I have no idea how I made this work
-		/// </summary>
-		private static void Cut_this_Face(
-			Vector3[] vertices,
-			Vector3[] normals,
-			Vector2[] uvs,
-			Vector4[] tangents,
-			int       submesh){
+        #region Cutting
+        // Caching
+        private static Mesh_Maker.Triangle _cacheLeftTriangle  = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
+        private static Mesh_Maker.Triangle _cacheRightTriangle = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
+        private static Mesh_Maker.Triangle _cacheNewTriangle  = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
+        // Functions
+        private static void Cut_this_Face(ref Mesh_Maker.Triangle triangle, int submesh)
+        {
 
-			bool[] sides = new bool[3];
-			sides[0] = _blade.GetSide(vertices[0]); // true = left
-			sides[1] = _blade.GetSide(vertices[1]);
-			sides[2] = _blade.GetSide(vertices[2]);
+            _isLeftSideCache[0] = _blade.GetSide(triangle.vertices[0]); // true = left
+            _isLeftSideCache[1] = _blade.GetSide(triangle.vertices[1]);
+            _isLeftSideCache[2] = _blade.GetSide(triangle.vertices[2]);
 
 
-			Vector3[] leftPoints = new Vector3[2];
-			Vector3[] leftNormals = new Vector3[2];
-			Vector2[] leftUvs = new Vector2[2];
-			Vector4[] leftTangents = new Vector4[2];
-			Vector3[] rightPoints = new Vector3[2];
-			Vector3[] rightNormals = new Vector3[2];
-			Vector2[] rightUvs = new Vector2[2];
-			Vector4[] rightTangents = new Vector4[2];
+            int leftCount = 0;
+            int rightCount = 0;
 
-			bool didset_left = false;
-			bool didset_right = false;
+            for (int i = 0; i < 3; i++)
+            {
+                if (_isLeftSideCache[i])
+                { // left
 
-			for(int i=0; i<3; i++){
+                    _cacheLeftTriangle.vertices[leftCount] = triangle.vertices[i];
+                    _cacheLeftTriangle.uvs[leftCount] = triangle.uvs[i];
+                    _cacheLeftTriangle.normals[leftCount] = triangle.normals[i];
+                    _cacheLeftTriangle.tangents[leftCount] = triangle.tangents[i];
+                    
+                    leftCount++;
+                }
+                else
+                { // right
 
-				if(sides[i]){
-					if(!didset_left){
-						didset_left = true;
+                    _cacheRightTriangle.vertices[rightCount] = triangle.vertices[i];
+                    _cacheRightTriangle.uvs[rightCount] = triangle.uvs[i];
+                    _cacheRightTriangle.normals[rightCount] = triangle.normals[i];
+                    _cacheRightTriangle.tangents[rightCount] = triangle.tangents[i];
 
-						leftPoints[0]   = vertices[i];
-						leftPoints[1]   = leftPoints[0];
-						leftUvs[0]     = uvs[i];
-						leftUvs[1]     = leftUvs[0];
-						leftNormals[0] = normals[i];
-						leftNormals[1] = leftNormals[0];
-						leftTangents[0] = tangents[i];
-						leftTangents[1] = leftTangents[0];
+                    rightCount++;
+                }
+            }
 
-					}else{
+            // find the new triangles X 3
+            // first the new vertices
 
-						leftPoints[1]   = vertices[i];
-						leftUvs[1]      = uvs[i];
-						leftNormals[1]  = normals[i];
-						leftTangents[1] = tangents[i];
+            // this will give me a triangle with the solo point as first
+            if (leftCount == 1)
+            {
+                _cacheTriangle.vertices[0] = _cacheLeftTriangle.vertices[0];
+                _cacheTriangle.uvs[0]      = _cacheLeftTriangle.uvs[0];
+                _cacheTriangle.normals[0]  = _cacheLeftTriangle.normals[0];
+                _cacheTriangle.tangents[0] = _cacheLeftTriangle.tangents[0];
 
-					}
-				}else{
-					if(!didset_right){
-						didset_right = true;
+                _cacheTriangle.vertices[1] = _cacheRightTriangle.vertices[0];
+                _cacheTriangle.uvs[1]      = _cacheRightTriangle.uvs[0];
+                _cacheTriangle.normals[1]  = _cacheRightTriangle.normals[0];
+                _cacheTriangle.tangents[1] = _cacheRightTriangle.tangents[0];
+                                                   
+                _cacheTriangle.vertices[2] = _cacheRightTriangle.vertices[1];
+                _cacheTriangle.uvs[2]      = _cacheRightTriangle.uvs[1];
+                _cacheTriangle.normals[2]  = _cacheRightTriangle.normals[1];
+                _cacheTriangle.tangents[2] = _cacheRightTriangle.tangents[1];
+            }
+            else // rightCount == 1
+            {
+                _cacheTriangle.vertices[0] = _cacheRightTriangle.vertices[0];
+                _cacheTriangle.uvs[0]      = _cacheRightTriangle.uvs[0];
+                _cacheTriangle.normals[0]  = _cacheRightTriangle.normals[0];
+                _cacheTriangle.tangents[0] = _cacheRightTriangle.tangents[0];
 
-						rightPoints[0]   = vertices[i];
-						rightPoints[1]   = rightPoints[0];
-						rightUvs[0]     = uvs[i];
-						rightUvs[1]     = rightUvs[0];
-						rightNormals[0] = normals[i];
-						rightNormals[1] = rightNormals[0];
-						rightTangents[0] = tangents[i];
-						rightTangents[1] = rightTangents[0];
+                _cacheTriangle.vertices[1] = _cacheLeftTriangle.vertices[0];
+                _cacheTriangle.uvs[1]      = _cacheLeftTriangle.uvs[0];
+                _cacheTriangle.normals[1]  = _cacheLeftTriangle.normals[0];
+                _cacheTriangle.tangents[1] = _cacheLeftTriangle.tangents[0];
+                                                   
+                _cacheTriangle.vertices[2] = _cacheLeftTriangle.vertices[1];
+                _cacheTriangle.uvs[2]      = _cacheLeftTriangle.uvs[1];
+                _cacheTriangle.normals[2]  = _cacheLeftTriangle.normals[1];
+                _cacheTriangle.tangents[2] = _cacheLeftTriangle.tangents[1];
+            }
 
-					}else{
+            // now to find the intersection points between the solo point and the others
+            float distance = 0;
+            float normalizedDistance = 0.0f;
+            Vector3 edgeVector = Vector3.zero; // contains edge length and direction
 
-						rightPoints[1]  = vertices[i];
-						rightUvs[1]     = uvs[i];
-						rightNormals[1] = normals[i];
-						rightTangents[1] = tangents[i];
+            edgeVector = _cacheTriangle.vertices[1] - _cacheTriangle.vertices[0];
+            _blade.Raycast(new Ray(_cacheTriangle.vertices[0], edgeVector.normalized), out distance);
 
-					}
-				}
-			}
+            normalizedDistance = distance / edgeVector.magnitude;
+            _cacheNewTriangle.vertices[0] = Vector3.Lerp(_cacheTriangle.vertices[0], _cacheTriangle.vertices[1], normalizedDistance);
+            _cacheNewTriangle.uvs[0]      = Vector2.Lerp(_cacheTriangle.uvs[0],      _cacheTriangle.uvs[1],      normalizedDistance);
+            _cacheNewTriangle.normals[0]  = Vector3.Lerp(_cacheTriangle.normals[0],  _cacheTriangle.normals[1],  normalizedDistance);
+            _cacheNewTriangle.tangents[0] = Vector4.Lerp(_cacheTriangle.tangents[0], _cacheTriangle.tangents[1], normalizedDistance);
+
+            edgeVector = _cacheTriangle.vertices[2] - _cacheTriangle.vertices[0];
+            _blade.Raycast(new Ray(_cacheTriangle.vertices[0], edgeVector.normalized), out distance);
+
+            normalizedDistance = distance / edgeVector.magnitude;
+            _cacheNewTriangle.vertices[1] = Vector3.Lerp(_cacheTriangle.vertices[0], _cacheTriangle.vertices[2], normalizedDistance);
+            _cacheNewTriangle.uvs[1]      = Vector2.Lerp(_cacheTriangle.uvs[0],      _cacheTriangle.uvs[2],      normalizedDistance);
+            _cacheNewTriangle.normals[1]  = Vector3.Lerp(_cacheTriangle.normals[0],  _cacheTriangle.normals[2],  normalizedDistance);
+            _cacheNewTriangle.tangents[1] = Vector4.Lerp(_cacheTriangle.tangents[0], _cacheTriangle.tangents[2], normalizedDistance);
+
+            //tracking newly created points
+            _newVertices.Add(_cacheNewTriangle.vertices[0]);
+            _newVertices.Add(_cacheNewTriangle.vertices[1]);
+
+            // make the new triangles
+            // one side will get 1 the other will get 2
+
+            if (leftCount == 1)
+            {
+                // first one on the left
+                _cacheTriangle.vertices[0] = _cacheLeftTriangle.vertices[0];
+                _cacheTriangle.uvs[0]      = _cacheLeftTriangle.uvs[0];
+                _cacheTriangle.normals[0]  = _cacheLeftTriangle.normals[0];
+                _cacheTriangle.tangents[0] = _cacheLeftTriangle.tangents[0];
+
+                _cacheTriangle.vertices[1] = _cacheNewTriangle.vertices[0];
+                _cacheTriangle.uvs[1]      = _cacheNewTriangle.uvs[0];
+                _cacheTriangle.normals[1]  = _cacheNewTriangle.normals[0];
+                _cacheTriangle.tangents[1] = _cacheNewTriangle.tangents[0];
+                                                   
+                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
+                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
+                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
+                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+                
+                // check if it is facing the right way
+                NormalCheck(ref _cacheTriangle);
+
+                // add it
+                _leftSide.AddTriangle(_cacheTriangle, submesh);
 
 
-			float normalizedDistance = 0.0f;
-			float distance = 0;
-			_blade.Raycast(new Ray(leftPoints[0], (rightPoints[0] - leftPoints[0]).normalized), out distance);
+                // other two on the right
+                _cacheTriangle.vertices[0] = _cacheRightTriangle.vertices[0];
+                _cacheTriangle.uvs[0]      = _cacheRightTriangle.uvs[0];
+                _cacheTriangle.normals[0]  = _cacheRightTriangle.normals[0];
+                _cacheTriangle.tangents[0] = _cacheRightTriangle.tangents[0];
 
-			normalizedDistance =  distance/(rightPoints[0] - leftPoints[0]).magnitude;
-			Vector3 newVertex1 = Vector3.Lerp(leftPoints[0], rightPoints[0], normalizedDistance);
-			Vector2 newUv1     = Vector2.Lerp(leftUvs[0], rightUvs[0], normalizedDistance);
-			Vector3 newNormal1 = Vector3.Lerp(leftNormals[0] , rightNormals[0], normalizedDistance);
-			Vector4 newTangent1 = Vector3.Lerp(leftTangents[0], rightTangents[0], normalizedDistance);		
+                _cacheTriangle.vertices[1] = _cacheNewTriangle.vertices[0];
+                _cacheTriangle.uvs[1]      = _cacheNewTriangle.uvs[0];
+                _cacheTriangle.normals[1]  = _cacheNewTriangle.normals[0];
+                _cacheTriangle.tangents[1] = _cacheNewTriangle.tangents[0];
 
-			_new_vertices.Add(newVertex1);
+                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
+                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
+                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
+                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+                
+                // check if it is facing the right way
+                NormalCheck(ref _cacheTriangle);
 
-			_blade.Raycast(new Ray(leftPoints[1], (rightPoints[1] - leftPoints[1]).normalized), out distance);
+                // add it
+                _rightSide.AddTriangle(_cacheTriangle, submesh);
 
-			normalizedDistance =  distance/(rightPoints[1] - leftPoints[1]).magnitude;
-			Vector3 newVertex2 = Vector3.Lerp(leftPoints[1], rightPoints[1], normalizedDistance);
-			Vector2 newUv2     = Vector2.Lerp(leftUvs[1], rightUvs[1], normalizedDistance);
-			Vector3 newNormal2 = Vector3.Lerp(leftNormals[1] , rightNormals[1], normalizedDistance);
-			Vector4 newTangent2 = Vector3.Lerp(leftTangents[1], rightTangents[1], normalizedDistance);		
+                // third
+                _cacheTriangle.vertices[0] = _cacheRightTriangle.vertices[0];
+                _cacheTriangle.uvs[0]      = _cacheRightTriangle.uvs[0];
+                _cacheTriangle.normals[0]  = _cacheRightTriangle.normals[0];
+                _cacheTriangle.tangents[0] = _cacheRightTriangle.tangents[0];
+
+                _cacheTriangle.vertices[1] = _cacheRightTriangle.vertices[1];
+                _cacheTriangle.uvs[1]      = _cacheRightTriangle.uvs[1];
+                _cacheTriangle.normals[1]  = _cacheRightTriangle.normals[1];
+                _cacheTriangle.tangents[1] = _cacheRightTriangle.tangents[1];
+
+                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
+                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
+                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
+                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+
+                // check if it is facing the right way
+                NormalCheck(ref _cacheTriangle);
+
+                // add it
+                _rightSide.AddTriangle(_cacheTriangle, submesh);
+            }
+            else
+            {
+                // first one on the right
+                _cacheTriangle.vertices[0] = _cacheRightTriangle.vertices[0];
+                _cacheTriangle.uvs[0]      = _cacheRightTriangle.uvs[0];
+                _cacheTriangle.normals[0]  = _cacheRightTriangle.normals[0];
+                _cacheTriangle.tangents[0] = _cacheRightTriangle.tangents[0];
+
+                _cacheTriangle.vertices[1] = _cacheNewTriangle.vertices[0];
+                _cacheTriangle.uvs[1]      = _cacheNewTriangle.uvs[0];
+                _cacheTriangle.normals[1]  = _cacheNewTriangle.normals[0];
+                _cacheTriangle.tangents[1] = _cacheNewTriangle.tangents[0];
+
+                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
+                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
+                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
+                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+
+                // check if it is facing the right way
+                NormalCheck(ref _cacheTriangle);
+
+                // add it
+                _rightSide.AddTriangle(_cacheTriangle, submesh);
 
 
-			_new_vertices.Add(newVertex2);
+                // other two on the left
+                _cacheTriangle.vertices[0] = _cacheLeftTriangle.vertices[0];
+                _cacheTriangle.uvs[0]      = _cacheLeftTriangle.uvs[0];
+                _cacheTriangle.normals[0]  = _cacheLeftTriangle.normals[0];
+                _cacheTriangle.tangents[0] = _cacheLeftTriangle.tangents[0];
 
+                _cacheTriangle.vertices[1] = _cacheNewTriangle.vertices[0];
+                _cacheTriangle.uvs[1]      = _cacheNewTriangle.uvs[0];
+                _cacheTriangle.normals[1]  = _cacheNewTriangle.normals[0];
+                _cacheTriangle.tangents[1] = _cacheNewTriangle.tangents[0];
 
-			Vector3[] final_verts; 
-			Vector3[] final_norms;
-			Vector2[] final_uvs;
-			Vector4[] final_tangents;
+                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
+                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
+                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
+                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
 
-			// first triangle
+                // check if it is facing the right way
+                NormalCheck(ref _cacheTriangle);
 
-			final_verts = new Vector3[]{leftPoints[0], newVertex1, newVertex2};
-			final_norms = new Vector3[]{leftNormals[0], newNormal1, newNormal2};
-			final_uvs   = new Vector2[]{leftUvs[0], newUv1, newUv2};
-			final_tangents = new Vector4[]{ leftTangents[0], newTangent1, newTangent2};
+                // add it
+                _leftSide.AddTriangle(_cacheTriangle, submesh);
 
-			if(final_verts[0] != final_verts[1] && final_verts[0] != final_verts[2]){
+                // third
+                _cacheTriangle.vertices[0] = _cacheLeftTriangle.vertices[0];
+                _cacheTriangle.uvs[0]      = _cacheLeftTriangle.uvs[0];
+                _cacheTriangle.normals[0]  = _cacheLeftTriangle.normals[0];
+                _cacheTriangle.tangents[0] = _cacheLeftTriangle.tangents[0];
+                                                   
+                _cacheTriangle.vertices[1] = _cacheLeftTriangle.vertices[1];
+                _cacheTriangle.uvs[1]      = _cacheLeftTriangle.uvs[1];
+                _cacheTriangle.normals[1]  = _cacheLeftTriangle.normals[1];
+                _cacheTriangle.tangents[1] = _cacheLeftTriangle.tangents[1];
 
-				if(Vector3.Dot(Vector3.Cross(final_verts[1] - final_verts[0], final_verts[2] - final_verts[0]), final_norms[0]) < 0){
-					FlipFace(final_verts, final_norms, final_uvs, final_tangents);
-				}
+                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
+                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
+                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
+                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
 
-				_leftSide.AddTriangle(final_verts, final_norms, final_uvs, final_tangents, submesh);
-			}
+                // check if it is facing the right way
+                NormalCheck(ref _cacheTriangle);
 
-			// second triangle
+                // add it
+                _leftSide.AddTriangle(_cacheTriangle, submesh);
+            }
+            
+        }
+        #endregion
 
-			final_verts = new Vector3[]{leftPoints[0], leftPoints[1], newVertex2};
-			final_norms = new Vector3[]{leftNormals[0], leftNormals[1], newNormal2};
-			final_uvs   = new Vector2[]{leftUvs[0], leftUvs[1], newUv2};
-			final_tangents = new Vector4[]{ leftTangents[0], leftTangents[1], newTangent2};
+        #region Capping
+        // Caching
+        private static List<int> _capUsedIndices = new List<int>();
+		private static List<int> _capPolygonIndices = new List<int>();
+        // Functions
+		static void Cap_the_Cut(){
 
-			if(final_verts[0] != final_verts[1] && final_verts[0] != final_verts[2]){
+            _capUsedIndices.Clear();
+            _capPolygonIndices.Clear();
 
-				if(Vector3.Dot(Vector3.Cross(final_verts[1] - final_verts[0], final_verts[2] - final_verts[0]), final_norms[0]) < 0){
-					FlipFace(final_verts, final_norms, final_uvs, final_tangents);
-				}
+            // find the needed polygons
+            // the cut faces added new vertices by 2 each time to make an edge
+            // if two edges contain the same Vector3 point, they are connected
+            for (int i = 0; i < _newVertices.Count; i+=2)
+            {
+                // check the edge
+                if (!_capUsedIndices.Contains(i)) // if it has one, it has this edge
+                {
+                    //new polygon started with this edge
+                    _capPolygonIndices.Clear();
+                    _capPolygonIndices.Add(i);
+                    _capPolygonIndices.Add(i + 1);
 
-				_leftSide.AddTriangle(final_verts, final_norms, final_uvs, final_tangents, submesh);
-			}
+                    _capUsedIndices.Add(i);
+                    _capUsedIndices.Add(i + 1);
 
-			// third triangle
+                    Vector3 connectionPointLeft  = _newVertices[i];
+                    Vector3 connectionPointRight = _newVertices[i + 1];
+                    bool isDone = false;
 
-			final_verts = new Vector3[]{rightPoints[0], newVertex1, newVertex2};
-			final_norms = new Vector3[]{rightNormals[0], newNormal1, newNormal2};
-			final_uvs   = new Vector2[]{rightUvs[0], newUv1, newUv2};
-			final_tangents = new Vector4[]{ rightTangents[0], newTangent1, newTangent2};
+                    // look for more edges
+                    while (!isDone)
+                    {
+                        isDone = true;
 
-			if(final_verts[0] != final_verts[1] && final_verts[0] != final_verts[2]){
+                        // loop through edges
+                        for (int index = 0; index < _newVertices.Count; index += 2)
+                        {   // if it has one, it has this edge
+                            if (!_capUsedIndices.Contains(index)) 
+                            {
+                                Vector3 nextPoint1 = _newVertices[index];
+                                Vector3 nextPoint2 = _newVertices[index + 1];
 
-				if(Vector3.Dot(Vector3.Cross(final_verts[1] - final_verts[0], final_verts[2] - final_verts[0]), final_norms[0]) < 0){
-					FlipFace(final_verts, final_norms, final_uvs, final_tangents);
-				}
+                                // check for next point in the chain
+                                if (connectionPointLeft == nextPoint1 ||
+                                    connectionPointLeft == nextPoint2 ||
+                                    connectionPointRight == nextPoint1 ||
+                                    connectionPointRight == nextPoint2)
+                                {
+                                    _capUsedIndices.Add(index);
+                                    _capUsedIndices.Add(index + 1);
 
-				_rightSide.AddTriangle(final_verts, final_norms, final_uvs, final_tangents, submesh);
-			}
+                                    // add the other
+                                    if (connectionPointLeft == nextPoint1)
+                                        _capPolygonIndices.Insert(0, index + 1);
+                                    else if (connectionPointLeft == nextPoint2)
+                                        _capPolygonIndices.Insert(0, index);
+                                    else if (connectionPointRight == nextPoint1)
+                                        _capPolygonIndices.Add(index + 1);
+                                    else if (connectionPointRight == nextPoint2)
+                                        _capPolygonIndices.Add(index);
 
-			// fourth triangle
+                                    connectionPointLeft = _newVertices[_capPolygonIndices[0]];
+                                    connectionPointRight = _newVertices[_capPolygonIndices[_capPolygonIndices.Count - 1]];
 
-			final_verts = new Vector3[]{rightPoints[0], rightPoints[1], newVertex2};
-			final_norms = new Vector3[]{rightNormals[0], rightNormals[1], newNormal2};
-			final_uvs   = new Vector2[]{rightUvs[0], rightUvs[1], newUv2};
-			final_tangents = new Vector4[]{ rightTangents[0], rightTangents[1], newTangent2};
+                                    isDone = false;
+                                }
+                            }
+                        }
+                    }// while isDone = False
 
-			if(final_verts[0] != final_verts[1] && final_verts[0] != final_verts[2]){
-
-				if(Vector3.Dot(Vector3.Cross(final_verts[1] - final_verts[0], final_verts[2] - final_verts[0]), final_norms[0]) < 0){
-					FlipFace(final_verts, final_norms, final_uvs, final_tangents);
-				}
-
-				_rightSide.AddTriangle(final_verts, final_norms, final_uvs, final_tangents, submesh);
-			}
-
+                    FillCap(_capPolygonIndices);
+                }
+            }
 		}
-
-		private static void FlipFace(
-			Vector3[] verts,
-			Vector3[] norms,
-			Vector2[] uvs, 
-			Vector4[] tangents)
-		{
-
-			Vector3 temp = verts[2];
-			verts[2] = verts[0];
-			verts[0] = temp;
-
-			temp = norms[2];
-			norms[2] = norms[0];
-			norms[0] = temp;
-
-			Vector2 temp2 = uvs[2];
-			uvs[2] = uvs[0];
-			uvs[0] = temp2;
-
-			Vector4 temp3 = tangents[2];
-			tangents[2] = tangents[0];
-			tangents[0] = temp3;
-
-		}
-			
-		private static List<Vector3> capVertTracker = new List<Vector3>();
-		private static List<Vector3> capVertpolygon = new List<Vector3>();
-
-		static void Capping(){
-
-			capVertTracker.Clear();
-
-			for(int i=0; i<_new_vertices.Count; i++)
-				if(!capVertTracker.Contains(_new_vertices[i]))
-				{
-					capVertpolygon.Clear();
-					capVertpolygon.Add(_new_vertices[i]);
-					capVertpolygon.Add(_new_vertices[i+1]);
-
-					capVertTracker.Add(_new_vertices[i]);
-					capVertTracker.Add(_new_vertices[i+1]);
-
-
-					bool isDone = false;
-					while(!isDone){
-						isDone = true;
-
-						for(int k=0; k<_new_vertices.Count; k+=2){ // go through the pairs
-
-							if(_new_vertices[k] == capVertpolygon[capVertpolygon.Count-1] && !capVertTracker.Contains(_new_vertices[k+1])){ // if so add the other
-
-								isDone = false;
-								capVertpolygon.Add(_new_vertices[k+1]);
-								capVertTracker.Add(_new_vertices[k+1]);
-
-							}else if(_new_vertices[k+1] == capVertpolygon[capVertpolygon.Count-1] && !capVertTracker.Contains(_new_vertices[k])){// if so add the other
-
-								isDone = false;
-								capVertpolygon.Add(_new_vertices[k]);
-								capVertTracker.Add(_new_vertices[k]);
-							}
-						}
-					}
-
-					FillCap(capVertpolygon);
-
-				}
-			
-		}
-
-		static void FillCap(List<Vector3> vertices){
+		static void FillCap(List<int> indices){
 
 
 			// center of the cap
 			Vector3 center = Vector3.zero;
-			foreach(Vector3 point in vertices)
-				center += point;
+			foreach(var index in indices)
+				center += _newVertices[index];
 
-			center = center/vertices.Count;
+			center = center/indices.Count;
+            
 
 			// you need an axis based on the cap
 			Vector3 upward = Vector3.zero;
@@ -427,47 +525,81 @@ namespace BLINDED_AM_ME{
 			Vector2 newUV1 = Vector2.zero;
 			Vector2 newUV2 = Vector2.zero;
 
-			for(int i=0; i<vertices.Count; i++){
+			for(int i=0; i<indices.Count-1; i++){
 
-				displacement = vertices[i] - center;
+				displacement = _newVertices[indices[i]] - center;
 				newUV1 = Vector3.zero;
 				newUV1.x = 0.5f + Vector3.Dot(displacement, left);
 				newUV1.y = 0.5f + Vector3.Dot(displacement, upward);
 				//newUV1.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
 
-				displacement = vertices[(i+1) % vertices.Count] - center;
+				displacement = _newVertices[indices[(i+1) % indices.Count]] - center;
 				newUV2 = Vector3.zero;
 				newUV2.x = 0.5f + Vector3.Dot(displacement, left);
 				newUV2.y = 0.5f + Vector3.Dot(displacement, upward);
-				//newUV2.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
-
-				Vector3[] final_verts = new Vector3[]{vertices[i], vertices[(i+1) % vertices.Count], center};
-				Vector3[] final_norms = new Vector3[]{-_blade.normal, -_blade.normal, -_blade.normal};
-				Vector2[] final_uvs   = new Vector2[]{newUV1, newUV2, new Vector2(0.5f, 0.5f)};
-				Vector4[] final_tangents = new Vector4[]{ Vector4.zero, Vector4.zero, Vector4.zero};
-
-				if(Vector3.Dot(Vector3.Cross(final_verts[1] - final_verts[0], final_verts[2] - final_verts[0]), final_norms[0]) < 0){
-					FlipFace(final_verts, final_norms, final_uvs, final_tangents);
-				}
-
-				_leftSide.AddTriangle(final_verts, final_norms, final_uvs, final_tangents,
-					_capMatSub);
+                //newUV2.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
 
 
-				final_norms = new Vector3[]{_blade.normal, _blade.normal, _blade.normal};
 
-				if(Vector3.Dot(Vector3.Cross(final_verts[1] - final_verts[0], final_verts[2] - final_verts[0]), final_norms[0]) < 0){
-					FlipFace(final_verts, final_norms, final_uvs, final_tangents);
-				}
+                _cacheNewTriangle.vertices[0] = _newVertices[indices[i]];
+                _cacheNewTriangle.uvs[0]      = newUV1;
+                _cacheNewTriangle.normals[0]  = -_blade.normal;
+                _cacheNewTriangle.tangents[0] = Vector4.zero;
+                
+                _cacheNewTriangle.vertices[1] = _newVertices[indices[(i + 1) % indices.Count]];
+                _cacheNewTriangle.uvs[1]      = newUV2;
+                _cacheNewTriangle.normals[1]  = -_blade.normal;
+                _cacheNewTriangle.tangents[1] = Vector4.zero;
+                
+                _cacheNewTriangle.vertices[2] = center;
+                _cacheNewTriangle.uvs[2]      = new Vector2(0.5f, 0.5f);
+                _cacheNewTriangle.normals[2]  = -_blade.normal;
+                _cacheNewTriangle.tangents[2] = Vector4.zero;
 
-				_rightSide.AddTriangle(final_verts, final_norms, final_uvs, final_tangents,
-					_capMatSub);
-				
+            
+                NormalCheck(ref _cacheNewTriangle);
 
-			}
-				
+                _leftSide.AddTriangle(_cacheNewTriangle, _capMatSub);
+
+                _cacheNewTriangle.normals[0] = _blade.normal;
+                _cacheNewTriangle.normals[1] = _blade.normal;
+                _cacheNewTriangle.normals[2] = _blade.normal;
+
+                NormalCheck(ref _cacheNewTriangle);
+
+                _rightSide.AddTriangle(_cacheNewTriangle, _capMatSub);
+
+            }
 
 		}
-	
-	}
+        #endregion
+
+        #region Misc.
+        private static void NormalCheck(ref Mesh_Maker.Triangle triangle)
+        {
+            Vector3 crossProduct = Vector3.Cross(triangle.vertices[1] - triangle.vertices[0], triangle.vertices[2] - triangle.vertices[0]);
+            Vector3 averageNormal = (triangle.normals[0] + triangle.normals[1] + triangle.normals[2]) / 3.0f;
+            float dotProduct = Vector3.Dot(averageNormal, crossProduct);
+            if (dotProduct < 0)
+            {
+                Vector3 temp = triangle.vertices[2];
+                triangle.vertices[2] = triangle.vertices[0];
+                triangle.vertices[0] = temp;
+
+                temp = triangle.normals[2];
+                triangle.normals[2] = triangle.normals[0];
+                triangle.normals[0] = temp;
+
+                Vector2 temp2 = triangle.uvs[2];
+                triangle.uvs[2] = triangle.uvs[0];
+                triangle.uvs[0] = temp2;
+
+                Vector4 temp3 = triangle.tangents[2];
+                triangle.tangents[2] = triangle.tangents[0];
+                triangle.tangents[0] = temp3;
+            }
+
+        }
+        #endregion
+    }
 }

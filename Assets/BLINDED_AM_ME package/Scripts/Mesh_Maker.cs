@@ -38,21 +38,53 @@ namespace BLINDED_AM_ME{
 		private List<Vector2>   _uvs       = new List<Vector2>();
 		private List<Vector4>   _tangents  = new List<Vector4>();
 		private List<List<int>> _subIndices = new List<List<int>>();
+        
+	    public int VertCount
+        {
+            get
+            {
+                return _vertices.Count;
+            }
+        }
 
+        /// <summary>
+        /// Clears all arrays
+        /// </summary>
+        public void Clear()
+        {
+            _vertices.Clear();
+            _normals.Clear();
+            _uvs.Clear();
+            _tangents.Clear();
+            _subIndices.Clear();
+        }
 
-			public int VertCount{
+        public void AddTriangle(Triangle triangle, int submesh)
+        {
+            AddTriangle(triangle.vertices, triangle.uvs, triangle.normals, triangle.tangents, submesh);
+        }
 
-				get{
-					return _vertices.Count;
-				}
-			}
-
-		public void AddTriangle(
-			Vector3[] vertices,
-			Vector3[] normals,
-			Vector2[] uvs,
-			int       submesh){
-
+        /// <summary>
+        /// Adds a new triangle to the return of GetMesh()
+        /// </summary>
+        /// <param name="vertices">Array of 3</param>
+        /// <param name="normals">Array of 3</param>
+        /// <param name="uvs">Array of 3</param>
+        /// <param name="submesh">If you don't know put 0</param>
+		public void AddTriangle(Vector3[] vertices, Vector2[] uvs, Vector3[] normals, int submesh = 0)
+        {
+            AddTriangle(vertices, uvs, normals, null, submesh);
+		}
+        /// <summary>
+        /// Same as the first, but with tangents
+        /// </summary>
+        /// <param name="vertices">Array of 3</param>
+        /// <param name="normals">Array of 3</param>
+        /// <param name="uvs">Array of 3</param>
+        /// <param name="tangents">Array of 3</param>
+        /// <param name="submesh">If you don't know put 0</param>
+        public void AddTriangle(Vector3[] vertices, Vector2[] uvs, Vector3[] normals, Vector4[] tangents, int submesh = 0)
+        {
 			int vertCount = _vertices.Count;
 
 			_vertices.Add(vertices[0]);
@@ -67,43 +99,12 @@ namespace BLINDED_AM_ME{
 			_uvs.Add(uvs[1]);
 			_uvs.Add(uvs[2]);
 
-			if(_subIndices.Count < submesh+1){
-				for(int i=_subIndices.Count; i<submesh+1; i++){
-					_subIndices.Add(new List<int>());
-				}
-			}
-
-			_subIndices[submesh].Add(vertCount);
-			_subIndices[submesh].Add(vertCount+1);
-			_subIndices[submesh].Add(vertCount+2);
-
-		}
-
-		public void AddTriangle(
-			Vector3[] vertices,
-			Vector3[] normals,
-			Vector2[] uvs,
-			Vector4[] tangents,
-			int       submesh){
-
-
-			int vertCount = _vertices.Count;
-
-			_vertices.Add(vertices[0]);
-			_vertices.Add(vertices[1]);
-			_vertices.Add(vertices[2]);
-
-			_normals.Add(normals[0]);
-			_normals.Add(normals[1]);
-			_normals.Add(normals[2]);
-
-			_uvs.Add(uvs[0]);
-			_uvs.Add(uvs[1]);
-			_uvs.Add(uvs[2]);
-
-			_tangents.Add(tangents[0]);
-			_tangents.Add(tangents[1]);
-			_tangents.Add(tangents[2]);
+            if (tangents != null)
+            {
+                _tangents.Add(tangents[0]);
+                _tangents.Add(tangents[1]);
+                _tangents.Add(tangents[2]);
+            }
 
 			if(_subIndices.Count < submesh+1){
 				for(int i=_subIndices.Count; i<submesh+1; i++){
@@ -117,7 +118,9 @@ namespace BLINDED_AM_ME{
 
 		}
 
-
+        /// <summary>
+        /// Cleans up Double Vertices
+        /// </summary>
 		public void RemoveDoubles(){
 
 			int dubCount = 0;
@@ -127,39 +130,41 @@ namespace BLINDED_AM_ME{
 			Vector2 uv     = Vector2.zero;
 			Vector4 tangent= Vector4.zero;
 
-			int i=0; 
-			while(i < VertCount){
+			int iterator=0; 
+			while(iterator < VertCount){
 
-				vertex = _vertices[i];
-				normal = _normals[i];
-				uv     = _uvs[i];
+				vertex = _vertices[iterator];
+				normal = _normals[iterator];
+				uv     = _uvs[iterator];
 
 				// look backwards for a match
-				for(int b=i-1; b>=0; b--){
+				for(int backward_iterator=iterator-1; backward_iterator>=0; backward_iterator--){
 
-					if(vertex  == _vertices[b] &&
-						normal == _normals[b] && 
-						uv     == _uvs[b])
+					if(vertex  == _vertices[backward_iterator] &&
+						normal == _normals[backward_iterator] && 
+						uv     == _uvs[backward_iterator])
 					{
 						dubCount++;
-						DoubleFound(b, i);
-						i--;
+						DoubleFound(backward_iterator, iterator);
+						iterator--;
 						break; // there should only be one
 					}
 				}
 
-				i++;
+				iterator++;
 
 			} // while
 
 			Debug.LogFormat("Doubles found {0}", dubCount);
 				
 		}
-
-		private void DoubleFound(int first, int duplicate){
-
-			// go through all indices an replace them
-
+        /// <summary>
+        /// // go through all indices an replace them
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="duplicate"></param>
+		private void DoubleFound(int first, int duplicate)
+        {
 			for(int h=0; h<_subIndices.Count; h++){
 				for(int i=0; i<_subIndices[h].Count; i++){
 
@@ -190,7 +195,7 @@ namespace BLINDED_AM_ME{
 			shape.SetNormals(_normals);
 			shape.SetUVs(0, _uvs);
 			shape.SetUVs(1, _uvs);
-
+            
 			if(_tangents.Count > 1)
 				shape.SetTangents(_tangents);
 
@@ -228,7 +233,26 @@ namespace BLINDED_AM_ME{
 
 			return shape;
 		}
-
 		#endif
+        
+        /// <summary>
+        /// every property should have 3 elements
+        /// </summary>
+        public struct Triangle
+        {
+            public Vector3[] vertices;
+            public Vector2[] uvs;
+            public Vector3[] normals;
+            public Vector4[] tangents;
+
+            public Triangle(Vector3[] vertices = null, Vector2[] uvs = null, Vector3[] normals = null, Vector4[] tangents = null)
+            {               
+                this.vertices = vertices;
+                this.uvs      = uvs;      
+                this.normals  = normals;
+                this.tangents = tangents;
+            }
+        }
+        
 	}
 }
