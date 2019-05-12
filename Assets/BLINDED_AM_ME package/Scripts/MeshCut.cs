@@ -278,10 +278,12 @@ namespace BLINDED_AM_ME{
             _cacheNewTriangle.normals[1]  = Vector3.Lerp(_cacheTriangle.normals[0],  _cacheTriangle.normals[2],  normalizedDistance);
             _cacheNewTriangle.tangents[1] = Vector4.Lerp(_cacheTriangle.tangents[0], _cacheTriangle.tangents[2], normalizedDistance);
 
-            //tracking newly created points
-            _newVertices.Add(_cacheNewTriangle.vertices[0]);
-            _newVertices.Add(_cacheNewTriangle.vertices[1]);
-
+            if (_cacheNewTriangle.vertices[0] != _cacheNewTriangle.vertices[1])
+            {
+                //tracking newly created points
+                _newVertices.Add(_cacheNewTriangle.vertices[0]);
+                _newVertices.Add(_cacheNewTriangle.vertices[1]);
+            }
             // make the new triangles
             // one side will get 1 the other will get 2
 
@@ -481,37 +483,51 @@ namespace BLINDED_AM_ME{
 
                                     // add the other
                                     if (connectionPointLeft == nextPoint1)
+                                    {
                                         _capPolygonIndices.Insert(0, index + 1);
+                                        connectionPointLeft = _newVertices[index + 1];
+                                    }
                                     else if (connectionPointLeft == nextPoint2)
+                                    {
                                         _capPolygonIndices.Insert(0, index);
+                                        connectionPointLeft = _newVertices[index];
+                                    }
                                     else if (connectionPointRight == nextPoint1)
+                                    {
                                         _capPolygonIndices.Add(index + 1);
+                                        connectionPointRight = _newVertices[index + 1];
+                                    }
                                     else if (connectionPointRight == nextPoint2)
+                                    {
                                         _capPolygonIndices.Add(index);
-
-                                    connectionPointLeft = _newVertices[_capPolygonIndices[0]];
-                                    connectionPointRight = _newVertices[_capPolygonIndices[_capPolygonIndices.Count - 1]];
-
+                                        connectionPointRight = _newVertices[index];
+                                    }
+                                    
                                     isDone = false;
                                 }
                             }
                         }
                     }// while isDone = False
+                    
+                    // check if the link is closed
+                    // first == last
+                     if (_newVertices[_capPolygonIndices[0]] == _newVertices[_capPolygonIndices[_capPolygonIndices.Count - 1]])
+                        _capPolygonIndices[_capPolygonIndices.Count - 1] = _capPolygonIndices[0];
+                    else
+                        _capPolygonIndices.Add(_capPolygonIndices[0]);
 
                     FillCap(_capPolygonIndices);
                 }
             }
 		}
 		static void FillCap(List<int> indices){
-
-
-			// center of the cap
-			Vector3 center = Vector3.zero;
+            
+            // center of the cap
+            Vector3 center = Vector3.zero;
 			foreach(var index in indices)
 				center += _newVertices[index];
 
 			center = center/indices.Count;
-            
 
 			// you need an axis based on the cap
 			Vector3 upward = Vector3.zero;
@@ -533,7 +549,7 @@ namespace BLINDED_AM_ME{
 				newUV1.y = 0.5f + Vector3.Dot(displacement, upward);
 				//newUV1.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
 
-				displacement = _newVertices[indices[(i+1) % indices.Count]] - center;
+				displacement = _newVertices[indices[i+1]] - center;
 				newUV2 = Vector3.zero;
 				newUV2.x = 0.5f + Vector3.Dot(displacement, left);
 				newUV2.y = 0.5f + Vector3.Dot(displacement, upward);
@@ -546,7 +562,7 @@ namespace BLINDED_AM_ME{
                 _cacheNewTriangle.normals[0]  = -_blade.normal;
                 _cacheNewTriangle.tangents[0] = Vector4.zero;
                 
-                _cacheNewTriangle.vertices[1] = _newVertices[indices[(i + 1) % indices.Count]];
+                _cacheNewTriangle.vertices[1] = _newVertices[indices[i + 1]];
                 _cacheNewTriangle.uvs[1]      = newUV2;
                 _cacheNewTriangle.normals[1]  = -_blade.normal;
                 _cacheNewTriangle.tangents[1] = Vector4.zero;
