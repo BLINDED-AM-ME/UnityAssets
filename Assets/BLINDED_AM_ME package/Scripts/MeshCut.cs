@@ -37,8 +37,8 @@ namespace BLINDED_AM_ME{
         // Caching
         private static Mesh_Maker _leftSide = new Mesh_Maker();
 		private static Mesh_Maker _rightSide = new Mesh_Maker();
-        private static Mesh_Maker.Triangle _cacheTriangle = new Mesh_Maker.Triangle( new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3] );
-        private static List<Vector3>       _newVertices = new List<Vector3>();
+        private static Mesh_Maker.Triangle _triangleCache = new Mesh_Maker.Triangle( new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3] );
+        private static List<Vector3>       _newVerticesCache = new List<Vector3>();
         private static bool[]              _isLeftSideCache = new bool[3];
         private static int                 _capMatSub = 1;
        
@@ -62,7 +62,7 @@ namespace BLINDED_AM_ME{
             // two new meshes
             _leftSide.Clear();
             _rightSide.Clear();
-            _newVertices.Clear();
+            _newVerticesCache.Clear();
 
             
 			int   index_1, index_2, index_3;
@@ -85,24 +85,24 @@ namespace BLINDED_AM_ME{
 					index_3 = indices[i+2];
 
                     // verts
-                    _cacheTriangle.vertices[0] = mesh_vertices[index_1];
-                    _cacheTriangle.vertices[1] = mesh_vertices[index_2];
-                    _cacheTriangle.vertices[2] = mesh_vertices[index_3];
+                    _triangleCache.vertices[0] = mesh_vertices[index_1];
+                    _triangleCache.vertices[1] = mesh_vertices[index_2];
+                    _triangleCache.vertices[2] = mesh_vertices[index_3];
 
                     // normals
-                    _cacheTriangle.normals[0] = mesh_normals[index_1];
-                    _cacheTriangle.normals[1] = mesh_normals[index_2];
-                    _cacheTriangle.normals[2] = mesh_normals[index_3];
+                    _triangleCache.normals[0] = mesh_normals[index_1];
+                    _triangleCache.normals[1] = mesh_normals[index_2];
+                    _triangleCache.normals[2] = mesh_normals[index_3];
 
                     // uvs
-                    _cacheTriangle.uvs[0] = mesh_uvs[index_1];
-                    _cacheTriangle.uvs[1] = mesh_uvs[index_2];
-                    _cacheTriangle.uvs[2] = mesh_uvs[index_3];
+                    _triangleCache.uvs[0] = mesh_uvs[index_1];
+                    _triangleCache.uvs[1] = mesh_uvs[index_2];
+                    _triangleCache.uvs[2] = mesh_uvs[index_3];
 
                     // tangents
-                    _cacheTriangle.tangents[0] = mesh_tangents[index_1];
-                    _cacheTriangle.tangents[1] = mesh_tangents[index_2];
-                    _cacheTriangle.tangents[2] = mesh_tangents[index_3];
+                    _triangleCache.tangents[0] = mesh_tangents[index_1];
+                    _triangleCache.tangents[1] = mesh_tangents[index_2];
+                    _triangleCache.tangents[2] = mesh_tangents[index_3];
 
 
                     // which side are the vertices on
@@ -115,13 +115,13 @@ namespace BLINDED_AM_ME{
 					if(_isLeftSideCache[0] == _isLeftSideCache[1] && _isLeftSideCache[0] == _isLeftSideCache[2]){
 
 						if(_isLeftSideCache[0]) // left side
-							_leftSide.AddTriangle( _cacheTriangle, submeshIterator);
+							_leftSide.AddTriangle( _triangleCache, submeshIterator);
 						else // right side
-							_rightSide.AddTriangle(_cacheTriangle, submeshIterator);
+							_rightSide.AddTriangle(_triangleCache, submeshIterator);
 
 					}else{ // cut the triangle
 						
-						Cut_this_Face(ref _cacheTriangle, submeshIterator);
+						Cut_this_Face(ref _triangleCache, submeshIterator);
 					}
 				}
 			}
@@ -177,9 +177,9 @@ namespace BLINDED_AM_ME{
 
         #region Cutting
         // Caching
-        private static Mesh_Maker.Triangle _cacheLeftTriangle  = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
-        private static Mesh_Maker.Triangle _cacheRightTriangle = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
-        private static Mesh_Maker.Triangle _cacheNewTriangle  = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
+        private static Mesh_Maker.Triangle _leftTriangleCache  = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
+        private static Mesh_Maker.Triangle _rightTriangleCache = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
+        private static Mesh_Maker.Triangle _newTriangleCache  = new Mesh_Maker.Triangle(new Vector3[3], new Vector2[3], new Vector3[3], new Vector4[3]);
         // Functions
         private static void Cut_this_Face(ref Mesh_Maker.Triangle triangle, int submesh)
         {
@@ -197,20 +197,20 @@ namespace BLINDED_AM_ME{
                 if (_isLeftSideCache[i])
                 { // left
 
-                    _cacheLeftTriangle.vertices[leftCount] = triangle.vertices[i];
-                    _cacheLeftTriangle.uvs[leftCount] = triangle.uvs[i];
-                    _cacheLeftTriangle.normals[leftCount] = triangle.normals[i];
-                    _cacheLeftTriangle.tangents[leftCount] = triangle.tangents[i];
+                    _leftTriangleCache.vertices[leftCount] = triangle.vertices[i];
+                    _leftTriangleCache.uvs[leftCount] = triangle.uvs[i];
+                    _leftTriangleCache.normals[leftCount] = triangle.normals[i];
+                    _leftTriangleCache.tangents[leftCount] = triangle.tangents[i];
                     
                     leftCount++;
                 }
                 else
                 { // right
 
-                    _cacheRightTriangle.vertices[rightCount] = triangle.vertices[i];
-                    _cacheRightTriangle.uvs[rightCount] = triangle.uvs[i];
-                    _cacheRightTriangle.normals[rightCount] = triangle.normals[i];
-                    _cacheRightTriangle.tangents[rightCount] = triangle.tangents[i];
+                    _rightTriangleCache.vertices[rightCount] = triangle.vertices[i];
+                    _rightTriangleCache.uvs[rightCount] = triangle.uvs[i];
+                    _rightTriangleCache.normals[rightCount] = triangle.normals[i];
+                    _rightTriangleCache.tangents[rightCount] = triangle.tangents[i];
 
                     rightCount++;
                 }
@@ -222,37 +222,37 @@ namespace BLINDED_AM_ME{
             // this will give me a triangle with the solo point as first
             if (leftCount == 1)
             {
-                _cacheTriangle.vertices[0] = _cacheLeftTriangle.vertices[0];
-                _cacheTriangle.uvs[0]      = _cacheLeftTriangle.uvs[0];
-                _cacheTriangle.normals[0]  = _cacheLeftTriangle.normals[0];
-                _cacheTriangle.tangents[0] = _cacheLeftTriangle.tangents[0];
+                _triangleCache.vertices[0] = _leftTriangleCache.vertices[0];
+                _triangleCache.uvs[0]      = _leftTriangleCache.uvs[0];
+                _triangleCache.normals[0]  = _leftTriangleCache.normals[0];
+                _triangleCache.tangents[0] = _leftTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[1] = _cacheRightTriangle.vertices[0];
-                _cacheTriangle.uvs[1]      = _cacheRightTriangle.uvs[0];
-                _cacheTriangle.normals[1]  = _cacheRightTriangle.normals[0];
-                _cacheTriangle.tangents[1] = _cacheRightTriangle.tangents[0];
+                _triangleCache.vertices[1] = _rightTriangleCache.vertices[0];
+                _triangleCache.uvs[1]      = _rightTriangleCache.uvs[0];
+                _triangleCache.normals[1]  = _rightTriangleCache.normals[0];
+                _triangleCache.tangents[1] = _rightTriangleCache.tangents[0];
                                                    
-                _cacheTriangle.vertices[2] = _cacheRightTriangle.vertices[1];
-                _cacheTriangle.uvs[2]      = _cacheRightTriangle.uvs[1];
-                _cacheTriangle.normals[2]  = _cacheRightTriangle.normals[1];
-                _cacheTriangle.tangents[2] = _cacheRightTriangle.tangents[1];
+                _triangleCache.vertices[2] = _rightTriangleCache.vertices[1];
+                _triangleCache.uvs[2]      = _rightTriangleCache.uvs[1];
+                _triangleCache.normals[2]  = _rightTriangleCache.normals[1];
+                _triangleCache.tangents[2] = _rightTriangleCache.tangents[1];
             }
             else // rightCount == 1
             {
-                _cacheTriangle.vertices[0] = _cacheRightTriangle.vertices[0];
-                _cacheTriangle.uvs[0]      = _cacheRightTriangle.uvs[0];
-                _cacheTriangle.normals[0]  = _cacheRightTriangle.normals[0];
-                _cacheTriangle.tangents[0] = _cacheRightTriangle.tangents[0];
+                _triangleCache.vertices[0] = _rightTriangleCache.vertices[0];
+                _triangleCache.uvs[0]      = _rightTriangleCache.uvs[0];
+                _triangleCache.normals[0]  = _rightTriangleCache.normals[0];
+                _triangleCache.tangents[0] = _rightTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[1] = _cacheLeftTriangle.vertices[0];
-                _cacheTriangle.uvs[1]      = _cacheLeftTriangle.uvs[0];
-                _cacheTriangle.normals[1]  = _cacheLeftTriangle.normals[0];
-                _cacheTriangle.tangents[1] = _cacheLeftTriangle.tangents[0];
+                _triangleCache.vertices[1] = _leftTriangleCache.vertices[0];
+                _triangleCache.uvs[1]      = _leftTriangleCache.uvs[0];
+                _triangleCache.normals[1]  = _leftTriangleCache.normals[0];
+                _triangleCache.tangents[1] = _leftTriangleCache.tangents[0];
                                                    
-                _cacheTriangle.vertices[2] = _cacheLeftTriangle.vertices[1];
-                _cacheTriangle.uvs[2]      = _cacheLeftTriangle.uvs[1];
-                _cacheTriangle.normals[2]  = _cacheLeftTriangle.normals[1];
-                _cacheTriangle.tangents[2] = _cacheLeftTriangle.tangents[1];
+                _triangleCache.vertices[2] = _leftTriangleCache.vertices[1];
+                _triangleCache.uvs[2]      = _leftTriangleCache.uvs[1];
+                _triangleCache.normals[2]  = _leftTriangleCache.normals[1];
+                _triangleCache.tangents[2] = _leftTriangleCache.tangents[1];
             }
 
             // now to find the intersection points between the solo point and the others
@@ -260,29 +260,29 @@ namespace BLINDED_AM_ME{
             float normalizedDistance = 0.0f;
             Vector3 edgeVector = Vector3.zero; // contains edge length and direction
 
-            edgeVector = _cacheTriangle.vertices[1] - _cacheTriangle.vertices[0];
-            _blade.Raycast(new Ray(_cacheTriangle.vertices[0], edgeVector.normalized), out distance);
+            edgeVector = _triangleCache.vertices[1] - _triangleCache.vertices[0];
+            _blade.Raycast(new Ray(_triangleCache.vertices[0], edgeVector.normalized), out distance);
 
             normalizedDistance = distance / edgeVector.magnitude;
-            _cacheNewTriangle.vertices[0] = Vector3.Lerp(_cacheTriangle.vertices[0], _cacheTriangle.vertices[1], normalizedDistance);
-            _cacheNewTriangle.uvs[0]      = Vector2.Lerp(_cacheTriangle.uvs[0],      _cacheTriangle.uvs[1],      normalizedDistance);
-            _cacheNewTriangle.normals[0]  = Vector3.Lerp(_cacheTriangle.normals[0],  _cacheTriangle.normals[1],  normalizedDistance);
-            _cacheNewTriangle.tangents[0] = Vector4.Lerp(_cacheTriangle.tangents[0], _cacheTriangle.tangents[1], normalizedDistance);
+            _newTriangleCache.vertices[0] = Vector3.Lerp(_triangleCache.vertices[0], _triangleCache.vertices[1], normalizedDistance);
+            _newTriangleCache.uvs[0]      = Vector2.Lerp(_triangleCache.uvs[0],      _triangleCache.uvs[1],      normalizedDistance);
+            _newTriangleCache.normals[0]  = Vector3.Lerp(_triangleCache.normals[0],  _triangleCache.normals[1],  normalizedDistance);
+            _newTriangleCache.tangents[0] = Vector4.Lerp(_triangleCache.tangents[0], _triangleCache.tangents[1], normalizedDistance);
 
-            edgeVector = _cacheTriangle.vertices[2] - _cacheTriangle.vertices[0];
-            _blade.Raycast(new Ray(_cacheTriangle.vertices[0], edgeVector.normalized), out distance);
+            edgeVector = _triangleCache.vertices[2] - _triangleCache.vertices[0];
+            _blade.Raycast(new Ray(_triangleCache.vertices[0], edgeVector.normalized), out distance);
 
             normalizedDistance = distance / edgeVector.magnitude;
-            _cacheNewTriangle.vertices[1] = Vector3.Lerp(_cacheTriangle.vertices[0], _cacheTriangle.vertices[2], normalizedDistance);
-            _cacheNewTriangle.uvs[1]      = Vector2.Lerp(_cacheTriangle.uvs[0],      _cacheTriangle.uvs[2],      normalizedDistance);
-            _cacheNewTriangle.normals[1]  = Vector3.Lerp(_cacheTriangle.normals[0],  _cacheTriangle.normals[2],  normalizedDistance);
-            _cacheNewTriangle.tangents[1] = Vector4.Lerp(_cacheTriangle.tangents[0], _cacheTriangle.tangents[2], normalizedDistance);
+            _newTriangleCache.vertices[1] = Vector3.Lerp(_triangleCache.vertices[0], _triangleCache.vertices[2], normalizedDistance);
+            _newTriangleCache.uvs[1]      = Vector2.Lerp(_triangleCache.uvs[0],      _triangleCache.uvs[2],      normalizedDistance);
+            _newTriangleCache.normals[1]  = Vector3.Lerp(_triangleCache.normals[0],  _triangleCache.normals[2],  normalizedDistance);
+            _newTriangleCache.tangents[1] = Vector4.Lerp(_triangleCache.tangents[0], _triangleCache.tangents[2], normalizedDistance);
 
-            if (_cacheNewTriangle.vertices[0] != _cacheNewTriangle.vertices[1])
+            if (_newTriangleCache.vertices[0] != _newTriangleCache.vertices[1])
             {
                 //tracking newly created points
-                _newVertices.Add(_cacheNewTriangle.vertices[0]);
-                _newVertices.Add(_cacheNewTriangle.vertices[1]);
+                _newVerticesCache.Add(_newTriangleCache.vertices[0]);
+                _newVerticesCache.Add(_newTriangleCache.vertices[1]);
             }
             // make the new triangles
             // one side will get 1 the other will get 2
@@ -290,140 +290,140 @@ namespace BLINDED_AM_ME{
             if (leftCount == 1)
             {
                 // first one on the left
-                _cacheTriangle.vertices[0] = _cacheLeftTriangle.vertices[0];
-                _cacheTriangle.uvs[0]      = _cacheLeftTriangle.uvs[0];
-                _cacheTriangle.normals[0]  = _cacheLeftTriangle.normals[0];
-                _cacheTriangle.tangents[0] = _cacheLeftTriangle.tangents[0];
+                _triangleCache.vertices[0] = _leftTriangleCache.vertices[0];
+                _triangleCache.uvs[0]      = _leftTriangleCache.uvs[0];
+                _triangleCache.normals[0]  = _leftTriangleCache.normals[0];
+                _triangleCache.tangents[0] = _leftTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[1] = _cacheNewTriangle.vertices[0];
-                _cacheTriangle.uvs[1]      = _cacheNewTriangle.uvs[0];
-                _cacheTriangle.normals[1]  = _cacheNewTriangle.normals[0];
-                _cacheTriangle.tangents[1] = _cacheNewTriangle.tangents[0];
+                _triangleCache.vertices[1] = _newTriangleCache.vertices[0];
+                _triangleCache.uvs[1]      = _newTriangleCache.uvs[0];
+                _triangleCache.normals[1]  = _newTriangleCache.normals[0];
+                _triangleCache.tangents[1] = _newTriangleCache.tangents[0];
                                                    
-                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
-                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
-                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
-                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+                _triangleCache.vertices[2] = _newTriangleCache.vertices[1];
+                _triangleCache.uvs[2]      = _newTriangleCache.uvs[1];
+                _triangleCache.normals[2]  = _newTriangleCache.normals[1];
+                _triangleCache.tangents[2] = _newTriangleCache.tangents[1];
                 
                 // check if it is facing the right way
-                NormalCheck(ref _cacheTriangle);
+                NormalCheck(ref _triangleCache);
 
                 // add it
-                _leftSide.AddTriangle(_cacheTriangle, submesh);
+                _leftSide.AddTriangle(_triangleCache, submesh);
 
 
                 // other two on the right
-                _cacheTriangle.vertices[0] = _cacheRightTriangle.vertices[0];
-                _cacheTriangle.uvs[0]      = _cacheRightTriangle.uvs[0];
-                _cacheTriangle.normals[0]  = _cacheRightTriangle.normals[0];
-                _cacheTriangle.tangents[0] = _cacheRightTriangle.tangents[0];
+                _triangleCache.vertices[0] = _rightTriangleCache.vertices[0];
+                _triangleCache.uvs[0]      = _rightTriangleCache.uvs[0];
+                _triangleCache.normals[0]  = _rightTriangleCache.normals[0];
+                _triangleCache.tangents[0] = _rightTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[1] = _cacheNewTriangle.vertices[0];
-                _cacheTriangle.uvs[1]      = _cacheNewTriangle.uvs[0];
-                _cacheTriangle.normals[1]  = _cacheNewTriangle.normals[0];
-                _cacheTriangle.tangents[1] = _cacheNewTriangle.tangents[0];
+                _triangleCache.vertices[1] = _newTriangleCache.vertices[0];
+                _triangleCache.uvs[1]      = _newTriangleCache.uvs[0];
+                _triangleCache.normals[1]  = _newTriangleCache.normals[0];
+                _triangleCache.tangents[1] = _newTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
-                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
-                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
-                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+                _triangleCache.vertices[2] = _newTriangleCache.vertices[1];
+                _triangleCache.uvs[2]      = _newTriangleCache.uvs[1];
+                _triangleCache.normals[2]  = _newTriangleCache.normals[1];
+                _triangleCache.tangents[2] = _newTriangleCache.tangents[1];
                 
                 // check if it is facing the right way
-                NormalCheck(ref _cacheTriangle);
+                NormalCheck(ref _triangleCache);
 
                 // add it
-                _rightSide.AddTriangle(_cacheTriangle, submesh);
+                _rightSide.AddTriangle(_triangleCache, submesh);
 
                 // third
-                _cacheTriangle.vertices[0] = _cacheRightTriangle.vertices[0];
-                _cacheTriangle.uvs[0]      = _cacheRightTriangle.uvs[0];
-                _cacheTriangle.normals[0]  = _cacheRightTriangle.normals[0];
-                _cacheTriangle.tangents[0] = _cacheRightTriangle.tangents[0];
+                _triangleCache.vertices[0] = _rightTriangleCache.vertices[0];
+                _triangleCache.uvs[0]      = _rightTriangleCache.uvs[0];
+                _triangleCache.normals[0]  = _rightTriangleCache.normals[0];
+                _triangleCache.tangents[0] = _rightTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[1] = _cacheRightTriangle.vertices[1];
-                _cacheTriangle.uvs[1]      = _cacheRightTriangle.uvs[1];
-                _cacheTriangle.normals[1]  = _cacheRightTriangle.normals[1];
-                _cacheTriangle.tangents[1] = _cacheRightTriangle.tangents[1];
+                _triangleCache.vertices[1] = _rightTriangleCache.vertices[1];
+                _triangleCache.uvs[1]      = _rightTriangleCache.uvs[1];
+                _triangleCache.normals[1]  = _rightTriangleCache.normals[1];
+                _triangleCache.tangents[1] = _rightTriangleCache.tangents[1];
 
-                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
-                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
-                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
-                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+                _triangleCache.vertices[2] = _newTriangleCache.vertices[1];
+                _triangleCache.uvs[2]      = _newTriangleCache.uvs[1];
+                _triangleCache.normals[2]  = _newTriangleCache.normals[1];
+                _triangleCache.tangents[2] = _newTriangleCache.tangents[1];
 
                 // check if it is facing the right way
-                NormalCheck(ref _cacheTriangle);
+                NormalCheck(ref _triangleCache);
 
                 // add it
-                _rightSide.AddTriangle(_cacheTriangle, submesh);
+                _rightSide.AddTriangle(_triangleCache, submesh);
             }
             else
             {
                 // first one on the right
-                _cacheTriangle.vertices[0] = _cacheRightTriangle.vertices[0];
-                _cacheTriangle.uvs[0]      = _cacheRightTriangle.uvs[0];
-                _cacheTriangle.normals[0]  = _cacheRightTriangle.normals[0];
-                _cacheTriangle.tangents[0] = _cacheRightTriangle.tangents[0];
+                _triangleCache.vertices[0] = _rightTriangleCache.vertices[0];
+                _triangleCache.uvs[0]      = _rightTriangleCache.uvs[0];
+                _triangleCache.normals[0]  = _rightTriangleCache.normals[0];
+                _triangleCache.tangents[0] = _rightTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[1] = _cacheNewTriangle.vertices[0];
-                _cacheTriangle.uvs[1]      = _cacheNewTriangle.uvs[0];
-                _cacheTriangle.normals[1]  = _cacheNewTriangle.normals[0];
-                _cacheTriangle.tangents[1] = _cacheNewTriangle.tangents[0];
+                _triangleCache.vertices[1] = _newTriangleCache.vertices[0];
+                _triangleCache.uvs[1]      = _newTriangleCache.uvs[0];
+                _triangleCache.normals[1]  = _newTriangleCache.normals[0];
+                _triangleCache.tangents[1] = _newTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
-                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
-                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
-                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+                _triangleCache.vertices[2] = _newTriangleCache.vertices[1];
+                _triangleCache.uvs[2]      = _newTriangleCache.uvs[1];
+                _triangleCache.normals[2]  = _newTriangleCache.normals[1];
+                _triangleCache.tangents[2] = _newTriangleCache.tangents[1];
 
                 // check if it is facing the right way
-                NormalCheck(ref _cacheTriangle);
+                NormalCheck(ref _triangleCache);
 
                 // add it
-                _rightSide.AddTriangle(_cacheTriangle, submesh);
+                _rightSide.AddTriangle(_triangleCache, submesh);
 
 
                 // other two on the left
-                _cacheTriangle.vertices[0] = _cacheLeftTriangle.vertices[0];
-                _cacheTriangle.uvs[0]      = _cacheLeftTriangle.uvs[0];
-                _cacheTriangle.normals[0]  = _cacheLeftTriangle.normals[0];
-                _cacheTriangle.tangents[0] = _cacheLeftTriangle.tangents[0];
+                _triangleCache.vertices[0] = _leftTriangleCache.vertices[0];
+                _triangleCache.uvs[0]      = _leftTriangleCache.uvs[0];
+                _triangleCache.normals[0]  = _leftTriangleCache.normals[0];
+                _triangleCache.tangents[0] = _leftTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[1] = _cacheNewTriangle.vertices[0];
-                _cacheTriangle.uvs[1]      = _cacheNewTriangle.uvs[0];
-                _cacheTriangle.normals[1]  = _cacheNewTriangle.normals[0];
-                _cacheTriangle.tangents[1] = _cacheNewTriangle.tangents[0];
+                _triangleCache.vertices[1] = _newTriangleCache.vertices[0];
+                _triangleCache.uvs[1]      = _newTriangleCache.uvs[0];
+                _triangleCache.normals[1]  = _newTriangleCache.normals[0];
+                _triangleCache.tangents[1] = _newTriangleCache.tangents[0];
 
-                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
-                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
-                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
-                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+                _triangleCache.vertices[2] = _newTriangleCache.vertices[1];
+                _triangleCache.uvs[2]      = _newTriangleCache.uvs[1];
+                _triangleCache.normals[2]  = _newTriangleCache.normals[1];
+                _triangleCache.tangents[2] = _newTriangleCache.tangents[1];
 
                 // check if it is facing the right way
-                NormalCheck(ref _cacheTriangle);
+                NormalCheck(ref _triangleCache);
 
                 // add it
-                _leftSide.AddTriangle(_cacheTriangle, submesh);
+                _leftSide.AddTriangle(_triangleCache, submesh);
 
                 // third
-                _cacheTriangle.vertices[0] = _cacheLeftTriangle.vertices[0];
-                _cacheTriangle.uvs[0]      = _cacheLeftTriangle.uvs[0];
-                _cacheTriangle.normals[0]  = _cacheLeftTriangle.normals[0];
-                _cacheTriangle.tangents[0] = _cacheLeftTriangle.tangents[0];
+                _triangleCache.vertices[0] = _leftTriangleCache.vertices[0];
+                _triangleCache.uvs[0]      = _leftTriangleCache.uvs[0];
+                _triangleCache.normals[0]  = _leftTriangleCache.normals[0];
+                _triangleCache.tangents[0] = _leftTriangleCache.tangents[0];
                                                    
-                _cacheTriangle.vertices[1] = _cacheLeftTriangle.vertices[1];
-                _cacheTriangle.uvs[1]      = _cacheLeftTriangle.uvs[1];
-                _cacheTriangle.normals[1]  = _cacheLeftTriangle.normals[1];
-                _cacheTriangle.tangents[1] = _cacheLeftTriangle.tangents[1];
+                _triangleCache.vertices[1] = _leftTriangleCache.vertices[1];
+                _triangleCache.uvs[1]      = _leftTriangleCache.uvs[1];
+                _triangleCache.normals[1]  = _leftTriangleCache.normals[1];
+                _triangleCache.tangents[1] = _leftTriangleCache.tangents[1];
 
-                _cacheTriangle.vertices[2] = _cacheNewTriangle.vertices[1];
-                _cacheTriangle.uvs[2]      = _cacheNewTriangle.uvs[1];
-                _cacheTriangle.normals[2]  = _cacheNewTriangle.normals[1];
-                _cacheTriangle.tangents[2] = _cacheNewTriangle.tangents[1];
+                _triangleCache.vertices[2] = _newTriangleCache.vertices[1];
+                _triangleCache.uvs[2]      = _newTriangleCache.uvs[1];
+                _triangleCache.normals[2]  = _newTriangleCache.normals[1];
+                _triangleCache.tangents[2] = _newTriangleCache.tangents[1];
 
                 // check if it is facing the right way
-                NormalCheck(ref _cacheTriangle);
+                NormalCheck(ref _triangleCache);
 
                 // add it
-                _leftSide.AddTriangle(_cacheTriangle, submesh);
+                _leftSide.AddTriangle(_triangleCache, submesh);
             }
             
         }
@@ -431,32 +431,32 @@ namespace BLINDED_AM_ME{
 
         #region Capping
         // Caching
-        private static List<int> _capUsedIndices = new List<int>();
-		private static List<int> _capPolygonIndices = new List<int>();
+        private static List<int> _capUsedIndicesCache = new List<int>();
+		private static List<int> _capPolygonIndicesCache = new List<int>();
         // Functions
-		static void Cap_the_Cut(){
+		private static void Cap_the_Cut(){
 
-            _capUsedIndices.Clear();
-            _capPolygonIndices.Clear();
+            _capUsedIndicesCache.Clear();
+            _capPolygonIndicesCache.Clear();
 
             // find the needed polygons
             // the cut faces added new vertices by 2 each time to make an edge
             // if two edges contain the same Vector3 point, they are connected
-            for (int i = 0; i < _newVertices.Count; i+=2)
+            for (int i = 0; i < _newVerticesCache.Count; i+=2)
             {
                 // check the edge
-                if (!_capUsedIndices.Contains(i)) // if it has one, it has this edge
+                if (!_capUsedIndicesCache.Contains(i)) // if it has one, it has this edge
                 {
                     //new polygon started with this edge
-                    _capPolygonIndices.Clear();
-                    _capPolygonIndices.Add(i);
-                    _capPolygonIndices.Add(i + 1);
+                    _capPolygonIndicesCache.Clear();
+                    _capPolygonIndicesCache.Add(i);
+                    _capPolygonIndicesCache.Add(i + 1);
 
-                    _capUsedIndices.Add(i);
-                    _capUsedIndices.Add(i + 1);
+                    _capUsedIndicesCache.Add(i);
+                    _capUsedIndicesCache.Add(i + 1);
 
-                    Vector3 connectionPointLeft  = _newVertices[i];
-                    Vector3 connectionPointRight = _newVertices[i + 1];
+                    Vector3 connectionPointLeft  = _newVerticesCache[i];
+                    Vector3 connectionPointRight = _newVerticesCache[i + 1];
                     bool isDone = false;
 
                     // look for more edges
@@ -465,12 +465,12 @@ namespace BLINDED_AM_ME{
                         isDone = true;
 
                         // loop through edges
-                        for (int index = 0; index < _newVertices.Count; index += 2)
+                        for (int index = 0; index < _newVerticesCache.Count; index += 2)
                         {   // if it has one, it has this edge
-                            if (!_capUsedIndices.Contains(index)) 
+                            if (!_capUsedIndicesCache.Contains(index)) 
                             {
-                                Vector3 nextPoint1 = _newVertices[index];
-                                Vector3 nextPoint2 = _newVertices[index + 1];
+                                Vector3 nextPoint1 = _newVerticesCache[index];
+                                Vector3 nextPoint2 = _newVerticesCache[index + 1];
 
                                 // check for next point in the chain
                                 if (connectionPointLeft == nextPoint1 ||
@@ -478,29 +478,29 @@ namespace BLINDED_AM_ME{
                                     connectionPointRight == nextPoint1 ||
                                     connectionPointRight == nextPoint2)
                                 {
-                                    _capUsedIndices.Add(index);
-                                    _capUsedIndices.Add(index + 1);
+                                    _capUsedIndicesCache.Add(index);
+                                    _capUsedIndicesCache.Add(index + 1);
 
                                     // add the other
                                     if (connectionPointLeft == nextPoint1)
                                     {
-                                        _capPolygonIndices.Insert(0, index + 1);
-                                        connectionPointLeft = _newVertices[index + 1];
+                                        _capPolygonIndicesCache.Insert(0, index + 1);
+                                        connectionPointLeft = _newVerticesCache[index + 1];
                                     }
                                     else if (connectionPointLeft == nextPoint2)
                                     {
-                                        _capPolygonIndices.Insert(0, index);
-                                        connectionPointLeft = _newVertices[index];
+                                        _capPolygonIndicesCache.Insert(0, index);
+                                        connectionPointLeft = _newVerticesCache[index];
                                     }
                                     else if (connectionPointRight == nextPoint1)
                                     {
-                                        _capPolygonIndices.Add(index + 1);
-                                        connectionPointRight = _newVertices[index + 1];
+                                        _capPolygonIndicesCache.Add(index + 1);
+                                        connectionPointRight = _newVerticesCache[index + 1];
                                     }
                                     else if (connectionPointRight == nextPoint2)
                                     {
-                                        _capPolygonIndices.Add(index);
-                                        connectionPointRight = _newVertices[index];
+                                        _capPolygonIndicesCache.Add(index);
+                                        connectionPointRight = _newVerticesCache[index];
                                     }
                                     
                                     isDone = false;
@@ -511,83 +511,179 @@ namespace BLINDED_AM_ME{
                     
                     // check if the link is closed
                     // first == last
-                     if (_newVertices[_capPolygonIndices[0]] == _newVertices[_capPolygonIndices[_capPolygonIndices.Count - 1]])
-                        _capPolygonIndices[_capPolygonIndices.Count - 1] = _capPolygonIndices[0];
+                     if (_newVerticesCache[_capPolygonIndicesCache[0]] == _newVerticesCache[_capPolygonIndicesCache[_capPolygonIndicesCache.Count - 1]])
+                        _capPolygonIndicesCache[_capPolygonIndicesCache.Count - 1] = _capPolygonIndicesCache[0];
                     else
-                        _capPolygonIndices.Add(_capPolygonIndices[0]);
+                        _capPolygonIndicesCache.Add(_capPolygonIndicesCache[0]);
 
-                    FillCap(_capPolygonIndices);
+                    // cap
+                    FillCap_Method1(_capPolygonIndicesCache);
                 }
             }
 		}
-		static void FillCap(List<int> indices){
-            
+		private static void FillCap_Method1(List<int> indices){
+
             // center of the cap
             Vector3 center = Vector3.zero;
-			foreach(var index in indices)
-				center += _newVertices[index];
+            foreach (var index in indices)
+                center += _newVerticesCache[index];
 
-			center = center/indices.Count;
+            center = center / indices.Count;
 
-			// you need an axis based on the cap
-			Vector3 upward = Vector3.zero;
-			// 90 degree turn
-			upward.x = _blade.normal.y;
-			upward.y = -_blade.normal.x;
-			upward.z = _blade.normal.z;
-			Vector3 left = Vector3.Cross(_blade.normal, upward);
+            // you need an axis based on the cap
+            Vector3 upward = Vector3.zero;
+            // 90 degree turn
+            upward.x = _blade.normal.y;
+            upward.y = -_blade.normal.x;
+            upward.z = _blade.normal.z;
+            Vector3 left = Vector3.Cross(_blade.normal, upward);
 
-			Vector3 displacement = Vector3.zero;
-			Vector2 newUV1 = Vector2.zero;
-			Vector2 newUV2 = Vector2.zero;
+            Vector3 displacement = Vector3.zero;
+            Vector2 newUV1 = Vector2.zero;
+            Vector2 newUV2 = Vector2.zero;
+            Vector2 newUV3 = Vector2.zero;
 
-			for(int i=0; i<indices.Count-1; i++){
+            // indices should be in order like a closed chain
 
-				displacement = _newVertices[indices[i]] - center;
-				newUV1 = Vector3.zero;
-				newUV1.x = 0.5f + Vector3.Dot(displacement, left);
-				newUV1.y = 0.5f + Vector3.Dot(displacement, upward);
-				//newUV1.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
+            // go through edges and eliminate by creating triangles with connected edges
+            // each new triangle removes 2 edges but creates 1 new edge
+            // keep the chain in order
+            int iterator = 0;
+            while (indices.Count > 2)
+            {
 
-				displacement = _newVertices[indices[i+1]] - center;
-				newUV2 = Vector3.zero;
-				newUV2.x = 0.5f + Vector3.Dot(displacement, left);
-				newUV2.y = 0.5f + Vector3.Dot(displacement, upward);
+                Vector3 link1 = _newVerticesCache[indices[iterator]];
+                Vector3 link2 = _newVerticesCache[indices[(iterator + 1) % indices.Count]];
+                Vector3 link3 = _newVerticesCache[indices[(iterator + 2) % indices.Count]];
+
+                displacement = link1 - center;
+                newUV1 = Vector3.zero;
+                newUV1.x = 0.5f + Vector3.Dot(displacement, left);
+                newUV1.y = 0.5f + Vector3.Dot(displacement, upward);
+                //newUV1.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
+
+                displacement = link2 - center;
+                newUV2 = Vector3.zero;
+                newUV2.x = 0.5f + Vector3.Dot(displacement, left);
+                newUV2.y = 0.5f + Vector3.Dot(displacement, upward);
+                //newUV2.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
+
+                displacement = link3 - center;
+                newUV3 = Vector3.zero;
+                newUV3.x = 0.5f + Vector3.Dot(displacement, left);
+                newUV3.y = 0.5f + Vector3.Dot(displacement, upward);
+                //newUV2.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
+
+
+                // add triangle
+                _newTriangleCache.vertices[0] = link1;
+                _newTriangleCache.uvs[0] = newUV1;
+                _newTriangleCache.normals[0] = -_blade.normal;
+                _newTriangleCache.tangents[0] = Vector4.zero;
+
+                _newTriangleCache.vertices[1] = link2;
+                _newTriangleCache.uvs[1] = newUV2;
+                _newTriangleCache.normals[1] = -_blade.normal;
+                _newTriangleCache.tangents[1] = Vector4.zero;
+
+                _newTriangleCache.vertices[2] = link3;
+                _newTriangleCache.uvs[2] = newUV3;
+                _newTriangleCache.normals[2] = -_blade.normal;
+                _newTriangleCache.tangents[2] = Vector4.zero;
+
+                // add to left side
+                NormalCheck(ref _newTriangleCache);
+
+                _leftSide.AddTriangle(_newTriangleCache, _capMatSub);
+
+                // add to right side
+                _newTriangleCache.normals[0] = _blade.normal;
+                _newTriangleCache.normals[1] = _blade.normal;
+                _newTriangleCache.normals[2] = _blade.normal;
+
+                NormalCheck(ref _newTriangleCache);
+
+                _rightSide.AddTriangle(_newTriangleCache, _capMatSub);
+
+
+                // adjust indices by removing the middle link
+                indices.RemoveAt((iterator + 1) % indices.Count);
+
+                // move on
+                iterator = (iterator + 1) % indices.Count;
+            }
+
+		}
+        private static void FillCap_Method2(List<int> indices)
+        {
+
+            // center of the cap
+            Vector3 center = Vector3.zero;
+            foreach (var index in indices)
+                center += _newVerticesCache[index];
+
+            center = center / indices.Count;
+
+            // you need an axis based on the cap
+            Vector3 upward = Vector3.zero;
+            // 90 degree turn
+            upward.x = _blade.normal.y;
+            upward.y = -_blade.normal.x;
+            upward.z = _blade.normal.z;
+            Vector3 left = Vector3.Cross(_blade.normal, upward);
+
+            Vector3 displacement = Vector3.zero;
+            Vector2 newUV1 = Vector2.zero;
+            Vector2 newUV2 = Vector2.zero;
+
+            for (int i = 0; i < indices.Count - 1; i++)
+            {
+
+                displacement = _newVerticesCache[indices[i]] - center;
+                newUV1 = Vector3.zero;
+                newUV1.x = 0.5f + Vector3.Dot(displacement, left);
+                newUV1.y = 0.5f + Vector3.Dot(displacement, upward);
+                //newUV1.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
+
+                displacement = _newVerticesCache[indices[i + 1]] - center;
+                newUV2 = Vector3.zero;
+                newUV2.x = 0.5f + Vector3.Dot(displacement, left);
+                newUV2.y = 0.5f + Vector3.Dot(displacement, upward);
                 //newUV2.z = 0.5f + Vector3.Dot(displacement, _blade.normal);
 
 
 
-                _cacheNewTriangle.vertices[0] = _newVertices[indices[i]];
-                _cacheNewTriangle.uvs[0]      = newUV1;
-                _cacheNewTriangle.normals[0]  = -_blade.normal;
-                _cacheNewTriangle.tangents[0] = Vector4.zero;
-                
-                _cacheNewTriangle.vertices[1] = _newVertices[indices[i + 1]];
-                _cacheNewTriangle.uvs[1]      = newUV2;
-                _cacheNewTriangle.normals[1]  = -_blade.normal;
-                _cacheNewTriangle.tangents[1] = Vector4.zero;
-                
-                _cacheNewTriangle.vertices[2] = center;
-                _cacheNewTriangle.uvs[2]      = new Vector2(0.5f, 0.5f);
-                _cacheNewTriangle.normals[2]  = -_blade.normal;
-                _cacheNewTriangle.tangents[2] = Vector4.zero;
+                _newTriangleCache.vertices[0] = _newVerticesCache[indices[i]];
+                _newTriangleCache.uvs[0] = newUV1;
+                _newTriangleCache.normals[0] = -_blade.normal;
+                _newTriangleCache.tangents[0] = Vector4.zero;
 
-            
-                NormalCheck(ref _cacheNewTriangle);
+                _newTriangleCache.vertices[1] = _newVerticesCache[indices[i + 1]];
+                _newTriangleCache.uvs[1] = newUV2;
+                _newTriangleCache.normals[1] = -_blade.normal;
+                _newTriangleCache.tangents[1] = Vector4.zero;
 
-                _leftSide.AddTriangle(_cacheNewTriangle, _capMatSub);
+                _newTriangleCache.vertices[2] = center;
+                _newTriangleCache.uvs[2] = new Vector2(0.5f, 0.5f);
+                _newTriangleCache.normals[2] = -_blade.normal;
+                _newTriangleCache.tangents[2] = Vector4.zero;
 
-                _cacheNewTriangle.normals[0] = _blade.normal;
-                _cacheNewTriangle.normals[1] = _blade.normal;
-                _cacheNewTriangle.normals[2] = _blade.normal;
 
-                NormalCheck(ref _cacheNewTriangle);
+                NormalCheck(ref _newTriangleCache);
 
-                _rightSide.AddTriangle(_cacheNewTriangle, _capMatSub);
+                _leftSide.AddTriangle(_newTriangleCache, _capMatSub);
+
+                _newTriangleCache.normals[0] = _blade.normal;
+                _newTriangleCache.normals[1] = _blade.normal;
+                _newTriangleCache.normals[2] = _blade.normal;
+
+                NormalCheck(ref _newTriangleCache);
+
+                _rightSide.AddTriangle(_newTriangleCache, _capMatSub);
 
             }
 
-		}
+        }
         #endregion
 
         #region Misc.
