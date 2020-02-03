@@ -159,12 +159,20 @@ namespace BLINDED_AM_ME{
 				segment_sourceMesh.uv[indices[1]],
 				segment_sourceMesh.uv[indices[2]]
 			};
-			// tangent
-			Vector4[] tangents = new Vector4[3]{
-				segment_sourceMesh.tangents[indices[0]],
-				segment_sourceMesh.tangents[indices[1]],
-				segment_sourceMesh.tangents[indices[2]]
-			};
+
+            var mesh_tangents = segment_sourceMesh.tangents;
+            if (mesh_tangents != null && mesh_tangents.Length == 0)
+                mesh_tangents = null;
+
+            // tangent
+            Vector4[] tangents = new Vector4[3];
+
+            if(mesh_tangents != null)
+            {
+                tangents[0] = mesh_tangents[indices[0]];
+                tangents[1] = mesh_tangents[indices[1]];
+                tangents[2] = mesh_tangents[indices[2]];
+			}
 
 			// apply offset
 			float lerpValue = 0.0f;
@@ -189,11 +197,13 @@ namespace BLINDED_AM_ME{
 
 				norms[i] = worldToLocal.MultiplyVector(Vector3.Lerp(normA, normB, lerpValue));
 
-				tangentA = localToWorld_A.MultiplyVector(tangents[i]);
-				tangentB = localToWorld_B.MultiplyVector(tangents[i]);
+                if (mesh_tangents != null)
+                {
+                    tangentA = localToWorld_A.MultiplyVector(tangents[i]);
+                    tangentB = localToWorld_B.MultiplyVector(tangents[i]);
 
-				tangents[i] = worldToLocal.MultiplyVector(Vector3.Lerp(tangentA, tangentB, lerpValue));
-
+                    tangents[i] = worldToLocal.MultiplyVector(Vector3.Lerp(tangentA, tangentB, lerpValue));
+                }
 			}
 
 			_maker.AddTriangle(verts, uvs, norms, tangents, submesh);
@@ -223,8 +233,7 @@ namespace BLINDED_AM_ME{
 		}
 
 		private void Apply(){
-
-
+            
 			if(removeDuplicateVertices){
 				_maker.RemoveDoubles();
 			}
