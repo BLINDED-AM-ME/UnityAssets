@@ -71,6 +71,8 @@ namespace BLINDED_AM_ME{
             var mesh_normals  = _victim_mesh.normals;
             var mesh_uvs      = _victim_mesh.uv;
             var mesh_tangents = _victim_mesh.tangents;
+            if (mesh_tangents != null && mesh_tangents.Length == 0)
+                mesh_tangents = null;
 
 			// go through the submeshes
 			for (int submeshIterator=0; submeshIterator<_victim_mesh.subMeshCount; submeshIterator++){
@@ -100,10 +102,18 @@ namespace BLINDED_AM_ME{
                     _triangleCache.uvs[2] = mesh_uvs[index_3];
 
                     // tangents
-                    _triangleCache.tangents[0] = mesh_tangents[index_1];
-                    _triangleCache.tangents[1] = mesh_tangents[index_2];
-                    _triangleCache.tangents[2] = mesh_tangents[index_3];
-
+                    if (mesh_tangents != null)
+                    {
+                        _triangleCache.tangents[0] = mesh_tangents[index_1];
+                        _triangleCache.tangents[1] = mesh_tangents[index_2];
+                        _triangleCache.tangents[2] = mesh_tangents[index_3];
+                    }
+                    else
+                    {
+                        _triangleCache.tangents[0] = Vector4.zero;
+                        _triangleCache.tangents[1] = Vector4.zero;
+                        _triangleCache.tangents[2] = Vector4.zero;
+                    }
 
                     // which side are the vertices on
                     _isLeftSideCache[0] = _blade.GetSide(mesh_vertices[index_1]);
@@ -705,7 +715,7 @@ namespace BLINDED_AM_ME{
                 Vector2 temp2 = triangle.uvs[2];
                 triangle.uvs[2] = triangle.uvs[0];
                 triangle.uvs[0] = temp2;
-
+                
                 Vector4 temp3 = triangle.tangents[2];
                 triangle.tangents[2] = triangle.tangents[0];
                 triangle.tangents[0] = temp3;
