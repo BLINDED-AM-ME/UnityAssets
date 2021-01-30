@@ -4,12 +4,14 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Dual_Textured_Lightup
-  m_Shader: {fileID: 4800000, guid: b3ad9e4d1c31a4d689b27bee691c45ed, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 8bb4e85e72eb8fa409ad1dcb6131c61b,
+    type: 3}
   m_ShaderKeywords: 
-  m_LightmapFlags: 5
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -18,6 +20,18 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_7B2E3587:
+        m_Texture: {fileID: 2800000, guid: df5218889ff5b49c68d19ac528fb3642, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_9F774EE:
+        m_Texture: {fileID: 2800000, guid: 48dc80be8f3f244628e87b64319da9b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_BD9C30E4:
+        m_Texture: {fileID: 2800000, guid: b5a9924878b3649a1bf8e8bcde4bfe24, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -35,6 +49,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Vector1_18468808: 0.5
+    - Vector1_4D9E1A7C: 0
+    - Vector1_A589DFE4: 1
+    - Vector1_F9038697: 1
     - _Emission1: 0
     - _Emission2: 0
     - _Fade1: 1
@@ -50,6 +68,9 @@ Material:
     - _MoveY1: 0
     - _MoveY2: 0
     m_Colors:
+    - Vector4_4637103E: {r: 1, g: 1, b: 0, a: 0}
+    - Vector4_7887AA71: {r: 1, g: 1, b: 0, a: 0}
+    - Vector4_806F5100: {r: 1, g: 1, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color1: {r: 1, g: 1, b: 1, a: 1}
     - _Color2: {r: 1, g: 1, b: 1, a: 1}

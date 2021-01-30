@@ -4,12 +4,14 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Dual_Textured
-  m_Shader: {fileID: 4800000, guid: be8f40b1556fa4b918a6ecb9c10c4f3e, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 5bc08f9fb03b6394eba1d36d9ff310b1,
+    type: 3}
   m_ShaderKeywords: 
-  m_LightmapFlags: 5
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -18,6 +20,54 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_7B2E3587:
+        m_Texture: {fileID: 2800000, guid: df5218889ff5b49c68d19ac528fb3642, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_7D95410E:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_9F774EE:
+        m_Texture: {fileID: 2800000, guid: 48dc80be8f3f244628e87b64319da9b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_BD9C30E4:
+        m_Texture: {fileID: 2800000, guid: b5a9924878b3649a1bf8e8bcde4bfe24, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DualTextured_1B2BDF39_Texture2DEBD0B3B6_3546354666:
+        m_Texture: {fileID: 2800000, guid: df5218889ff5b49c68d19ac528fb3642, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Stencil:
         m_Texture: {fileID: 2800000, guid: 286aa924424c34c1a89f9b5ef480a413, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -31,10 +81,50 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - BOOLEAN_9571FA6: 0
+    - ENUM_B53168CA: 0
+    - Vector1_18468808: 0.5
+    - Vector1_4D9E1A7C: 0
+    - Vector1_6F2F7423: 0
+    - Vector1_A589DFE4: 1
+    - Vector1_E0ACC925: 0.2357416
+    - Vector1_F9038697: 1
+    - _AlphaClip: 0
+    - _Blend: 0
+    - _BumpScale: 1
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _EnvironmentReflections: 1
     - _Fade1: 1
     - _Fade2: 1
+    - _GlossMapScale: 0
     - _Glossiness: 0.5
+    - _GlossyReflections: 0
     - _Metallic: 0
+    - _OcclusionStrength: 1
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
+    - _Smoothness: 0.5
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _Surface: 0
+    - _WorkflowMode: 1
+    - _ZWrite: 1
     m_Colors:
+    - Vector2_342F01BF: {r: 0, g: 0, b: 0, a: 0}
+    - Vector2_5DE21EE: {r: 0, g: 0, b: 0, a: 0}
+    - Vector2_5FA2799F: {r: 1, g: 1, b: 0, a: 0}
+    - Vector2_A0F46829: {r: 1, g: 1, b: 0, a: 0}
+    - Vector2_C9FA7446: {r: 0, g: 0, b: 0, a: 0}
+    - Vector2_EC88D5FB: {r: 1, g: 1, b: 0, a: 0}
+    - Vector4_4637103E: {r: 1, g: 1, b: 0, a: 0}
+    - Vector4_7887AA71: {r: 1, g: 1, b: 0, a: 0}
+    - Vector4_806F5100: {r: 1, g: 1, b: 0, a: 0}
+    - _BaseColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _Color1: {r: 1, g: 1, b: 1, a: 1}
     - _Color2: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}

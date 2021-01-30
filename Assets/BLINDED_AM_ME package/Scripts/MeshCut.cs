@@ -3,7 +3,7 @@
 //    
 //    Copyright (c) 2017 Dustin Whirle
 //    
-//    My Yrefube stuff: https://www.yrefube.com/playlist?list=PL-sp8pM7xzbVls1NovXqwgfBQiwhTA_Ya
+//    My Youtube stuff: https://www.youtube.com/playlist?list=PL-sp8pM7xzbVls1NovXqwgfBQiwhTA_Ya
 //    
 //    Permission is hereby granted, free of charge, to any person obtaining a copy
 //    of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ namespace BLINDED_AM_ME{
             _newVerticesCache.Clear();
 
             
-			int   index_1, index_2, index_3;
+			int index_1, index_2, index_3;
 
             var mesh_vertices = _victim_mesh.vertices;
             var mesh_normals  = _victim_mesh.normals;
