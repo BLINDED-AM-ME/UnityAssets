@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2017 Dustin Whirle
+Copyright (c) 2022 Dustin Whirle
 
 My Youtube stuff: https://www.youtube.com/playlist?list=PL-sp8pM7xzbVls1NovXqwgfBQiwhTA_Ya
 
