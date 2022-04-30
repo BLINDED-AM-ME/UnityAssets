@@ -1,10 +1,10 @@
 # UnityAssets
 
-
 MIT License
 
 Copyright (c) 2022 Dustin Whirle
 
+This is a Unity Project folder
 My Youtube stuff: https://www.youtube.com/playlist?list=PL-sp8pM7xzbVls1NovXqwgfBQiwhTA_Ya
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
