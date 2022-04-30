@@ -13,3 +13,6 @@ UnityPackageManager/manifest.json
 .vs
 Assets/Samples
 Assets/Samples.meta
+
+Assets/_Private
+Assets/_Private.meta
