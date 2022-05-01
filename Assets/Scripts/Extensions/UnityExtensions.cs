@@ -34,6 +34,7 @@ namespace BLINDED_AM_ME.Extensions
                 callback(task.Result);
         }
 
+        /// <summary> Matrix4x4.TRS will throw an error with an invalid Quaternion </summary>
         public static bool IsValid(this Quaternion quaternion)
         {
             if (float.IsNaN(quaternion.x)

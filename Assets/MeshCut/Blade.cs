@@ -148,7 +148,7 @@ public class Blade : MonoBehaviour
 		//var mesh = leftMeshFilter.mesh;
 
         // Cut
-        yield return mesh.CutCoroutine(blade, capSubmeshIndex, cancellationToken,
+        yield return mesh.CutCoroutine(blade,
             (pieces) =>
             {
                 leftSide.name = "LeftSide";
@@ -186,7 +186,7 @@ public class Blade : MonoBehaviour
                 if (!rightSide.GetComponent<Rigidbody>())
                     rightSide.AddComponent<Rigidbody>();
 
-            });
+            }, capSubmeshIndex, cancellationToken);
 	}
 
 	void OnDrawGizmosSelected()
