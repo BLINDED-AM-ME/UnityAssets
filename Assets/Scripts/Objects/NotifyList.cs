@@ -7,17 +7,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BLINDED_AM_ME
-{ 
-    /// <summary> A List with events </summary>
-    /// <remarks> Because ObservableCollection does not give removed items when Clear is Called </remarks>
-    public class NotifyCollection<T> : IList<T>, INotifyCollectionChanged
+{
+    /// <summary> List with events </summary>
+    /// <remarks> Because ObservableCollection does not give the items when Clear() is called </remarks>
+    /// <typeparam name="T"></typeparam>
+    public class NotifyList<T> : IList<T>, IList, INotifyCollectionChanged
     {
-        private List<T> _items = new List<T>();
-
-        public delegate void ItemEventHandler(object sender, T item);
-        public event ItemEventHandler ItemAdded;
-        public event ItemEventHandler ItemRemoved;
+        public event EventHandler<T> ItemAdded;
+        public event EventHandler<T> ItemRemoved;
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        private List<T> _items;
 
         public T this[int index]
         {
@@ -36,7 +36,35 @@ namespace BLINDED_AM_ME
             }
         }
 
-        public NotifyCollection() { }
+        object IList.this[int index]
+        {
+            get => ((IList)_items)[index];
+            set
+            {
+                var old = _items[index];
+                if (!Equals(old, value))
+                {
+                    _items[index] = (T)value;
+
+                    OnItemRemoved(old);
+                    OnItemAdded((T)value);
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, old));
+                }
+            }
+        }
+
+        public NotifyList()
+        {
+            _items = new List<T>();
+        }
+        public NotifyList(int capacity)
+        {
+            _items = new List<T>(capacity);
+        }
+        public NotifyList(IEnumerable<T> collection)
+        {
+            _items = new List<T>(collection);
+        }
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
@@ -53,7 +81,16 @@ namespace BLINDED_AM_ME
 
         public int Count => _items.Count;
         public bool IsReadOnly => false;
+        public bool IsFixedSize => ((IList)_items).IsFixedSize;
+        public bool IsSynchronized => ((ICollection)_items).IsSynchronized;
+        public object SyncRoot => ((ICollection)_items).SyncRoot;
 
+        public int Add(object value)
+        {
+            var x = Count;
+            Add((T)value);
+            return x;
+        }
         public void Add(T item)
         {
             var oldCount = Count;
@@ -72,6 +109,10 @@ namespace BLINDED_AM_ME
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, collection));
         }
 
+        public void Insert(int index, object value)
+        {
+            Insert(index, (T)value);
+        }
         public void Insert(int index, T item)
         {
             _items.Insert(index, item);
@@ -88,6 +129,10 @@ namespace BLINDED_AM_ME
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<T>(collection), index));
         }
 
+        public void Remove(object value)
+        {
+            Remove((T)value);
+        }
         public bool Remove(T item)
         {
             if (_items.Remove(item))
@@ -127,15 +172,23 @@ namespace BLINDED_AM_ME
             foreach (var x in old)
                 OnItemRemoved(x);
 
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, old));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, old));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public List<T> GetRange(int index, int count) => _items.GetRange(index, count);
+
+        public int IndexOf(object value) => ((IList)_items).IndexOf(value);
         public int IndexOf(T item) => _items.IndexOf(item);
+
+        public bool Contains(object value) => ((IList)_items).Contains(value);
         public bool Contains(T item) => _items.Contains(item);
+
+        public void CopyTo(Array array, int index) => ((ICollection)_items).CopyTo(array, index);
         public void CopyTo(T[] array, int arrayIndex) => _items.CopyTo(array, arrayIndex);
 
         public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
+
     }
 }
