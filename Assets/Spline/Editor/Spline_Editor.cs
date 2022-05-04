@@ -7,7 +7,6 @@ using System;
 
 namespace BLINDED_AM_ME.Inspector
 {
-	
 	[CustomEditor(typeof(Spline))]
 	[CanEditMultipleObjects]
 	public class Spline_Editor : Editor {
@@ -20,7 +19,5 @@ namespace BLINDED_AM_ME.Inspector
 				foreach (Spline target in targets)
 					target.GenerateMesh();
 		}
-
 	}
-
 }

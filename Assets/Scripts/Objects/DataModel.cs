@@ -20,6 +20,7 @@ namespace BLINDED_AM_ME
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
+		/// <returns> true if property was changed </returns>
 		protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
 		{
 			if (Equals(storage, value))

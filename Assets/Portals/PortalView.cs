@@ -9,6 +9,7 @@ using UnityEngine;
 using System.Collections;
 using System;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace BLINDED_AM_ME
 {
@@ -25,15 +26,71 @@ namespace BLINDED_AM_ME
 
 		public Transform exit;
 		public Camera    scoutCamera;
+		public TextureSize targetTextureSize = TextureSize._512;
 		
 		public float           clippingDistance = 0.05f;
-		public ClippingOptions clippingOption = ClippingOptions.RelativeToView;
-		public Vector3         clippingNormal = -Vector3.forward;
+		public ClippingOptions clippingOption = ClippingOptions.RelativeToSelf;
+		public Vector3         clippingNormal = Vector3.forward;
+
+		private PortalViewDataModel _dataModel = new PortalViewDataModel();
+		private MeshRenderer _meshRenderer;
+
+		public PortalView()
+        {
+            _dataModel.PropertyChanged += DataModel_PropertyChanged;
+        }
+
+        private void DataModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+				case nameof(PortalViewDataModel.Material):
+					_meshRenderer.sharedMaterial = _dataModel.Material;
+					break;
+            }
+        }
+
+        private void Reset()
+        {
+			Start();
+        }
+
+        private void Start()
+        {
+			_meshRenderer = GetComponent<MeshRenderer>();
+
+            if (scoutCamera == null)
+            {
+                for (int i = 0; i < transform.childCount; i++)
+                {
+					var child = transform.GetChild(i);
+					var cam = child.GetComponent<Camera>();
+					if (cam)
+					{
+						scoutCamera = cam;
+						break;
+					}
+                }
+            }
+			
+			if (scoutCamera == null)
+            {
+				var obj = new GameObject("ScoutCam", typeof(Camera));
+				scoutCamera = obj.GetComponent<Camera>();
+            }
+
+			_dataModel.ScoutCamera = scoutCamera;
+			_dataModel.TargetTextureSize = targetTextureSize;
+		}
 
 		private Vector4 _clippingPlane = new Vector4();
-		private static bool _isRenderRecursion = false;
+        private static bool _isRenderRecursion = false;
 		public void OnWillRenderObject()
 		{
+			_dataModel.ScoutCamera = scoutCamera;
+			_dataModel.Material = _meshRenderer.sharedMaterial;
+			_dataModel.TargetTextureSize = targetTextureSize;
+
 			Camera cam = Camera.current;
 			if (!cam
 			 || !exit
@@ -100,9 +157,89 @@ namespace BLINDED_AM_ME
 			_isRenderRecursion = false;
 		}
 
-		//_portalTexture = new RenderTexture(portalTextureSize, portalTextureSize, 16, RenderTextureFormat.ARGB32);
-		//_portalTexture.name = "__PortalRenderTexture" + GetInstanceID();
-		//_portalTexture.hideFlags = HideFlags.DontSave;
-		//		_portalTexture.Create();
+		private class PortalViewDataModel : DataModel
+        {
+			private Camera _scoutCamera;
+			public Camera ScoutCamera
+			{
+				get => _scoutCamera;
+				set => SetProperty(ref _scoutCamera, value);
+			}
+			
+			private TextureSize _targetTextureSize = TextureSize._32;
+			public TextureSize TargetTextureSize
+			{
+				get => _targetTextureSize;
+				set => SetProperty(ref _targetTextureSize, value);
+			}
+
+			private RenderTexture _targetTexture;
+			public RenderTexture TargetTexture
+			{
+                get => _targetTexture;
+				set
+				{
+					var old = _targetTexture;
+					if (SetProperty(ref _targetTexture, value))
+						if(old != null)
+							old.Release();
+				}
+			}
+			
+			private Material _material;
+			public Material Material
+			{
+				get => _material;
+				set => SetProperty(ref _material, value);
+			}
+
+			public PortalViewDataModel()
+            {
+
+            }
+
+            protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+            {
+				switch (propertyName)
+                {
+					case nameof(TargetTextureSize):
+						var targetTexture = new RenderTexture((int)TargetTextureSize, (int)TargetTextureSize, 16, RenderTextureFormat.ARGB32);
+						targetTexture.name = "__PortalRenderTexture" + targetTexture.GetInstanceID();
+						targetTexture.hideFlags = HideFlags.DontSave;
+						targetTexture.Create();
+						TargetTexture = targetTexture;
+						break;
+					
+					case nameof(Material):
+						if (Material == null)
+							break;
+
+						// create an instance
+						var name = _material.name.Split('-').First();
+						_material = new Material(_material);
+						_material.name = name + _material.GetInstanceID(); 
+						
+						if (TargetTexture != null)
+							Material.mainTexture = TargetTexture;
+
+						break;
+
+					case nameof(ScoutCamera):
+					case nameof(TargetTexture):
+						if (TargetTexture == null)
+							break;
+
+                        if (ScoutCamera != null)
+                            ScoutCamera.targetTexture = TargetTexture;
+
+						if (Material != null)
+							Material.mainTexture = TargetTexture;
+
+						break;
+                }
+
+                base.OnPropertyChanged(propertyName);
+            }
+		}
 	}
 }

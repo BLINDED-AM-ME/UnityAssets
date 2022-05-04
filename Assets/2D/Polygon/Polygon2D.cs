@@ -20,7 +20,7 @@ namespace BLINDED_AM_ME._2D
 	{
 
 		// Clockwise
-		private NotifyCollection<Vector3> _points = new NotifyCollection<Vector3>() 
+		private NotifyList<Vector3> _points = new NotifyList<Vector3>() 
 		{ 
 			Vector2.zero, 
 			Vector2.up, 

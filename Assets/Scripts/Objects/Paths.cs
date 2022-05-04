@@ -12,7 +12,7 @@ using BLINDED_AM_ME.Extensions;
 namespace BLINDED_AM_ME
 {
 	/// <summary> List of Points </summary>
-	public class PathPoints : NotifyCollection<Vector3>
+	public class PathPoints : NotifyList<Vector3>
 	{
 		private float[] _distances = new float[0];
 
@@ -123,7 +123,7 @@ namespace BLINDED_AM_ME
 	}
 
 	/// <summary> Matrices contain origin, rotation, and scale </summary>
-	public class PathMatrices : NotifyCollection<Matrix4x4>
+	public class PathMatrices : NotifyList<Matrix4x4>
     {
 		private float[] _distances = new float[0];
 

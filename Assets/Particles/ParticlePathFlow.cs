@@ -37,7 +37,11 @@ namespace BLINDED_AM_ME
 			_particle_system = GetComponent<ParticleSystem>();
 		}
 
-		void LateUpdate () 
+
+		private float _dist = 0;
+		Matrix4x4 _matrix;
+		Vector2 _offset;
+		void Update () 
 		{
 			if (Path == null)
 				return;
@@ -66,31 +70,31 @@ namespace BLINDED_AM_ME
 					// Path_Point axis = _path_comp.GetPathPoint(_path_comp.TotalDistance * normalizedLifetime);
 
 					// This made it based on the paritcle speed
-					float dist = (particle.startLifetime - particle.remainingLifetime) * particle.velocity.magnitude;
+					_dist = (particle.startLifetime - particle.remainingLifetime) * particle.velocity.magnitude;
 
 					if (hasRandomStartingPoints)
-						dist += Get_Value_From_Random_Seed_0t1(particle.randomSeed, 100.0f) * totalDistance;
+						_dist += Get_Value_From_Random_Seed_0t1(particle.randomSeed, 100.0f) * totalDistance;
 
-					dist %= totalDistance;
+					_dist %= totalDistance;
 
 					if (pathWidth <= 0)
                     {
 						if (_particle_system.main.simulationSpace == ParticleSystemSimulationSpace.Local)
-							_particle_array[i].position = transform.worldToLocalMatrix.MultiplyPoint3x4(Path.GetPoint(dist));
+							_particle_array[i].position = transform.worldToLocalMatrix.MultiplyPoint3x4(Path.GetPoint(_dist));
 						else
-							_particle_array[i].position = Path.GetPoint(dist);
+							_particle_array[i].position = Path.GetPoint(_dist);
 					}
 					else
                     {
-						var matrix = Path.GetMatrixFollowing(dist);
-						var offset = MathExtensions.Geometry.AngleToDir2D(particle.randomSeed % 360.0f);
-						offset *= Get_Value_From_Random_Seed_0t1(particle.randomSeed, 150.0f) * pathWidth;
+						_matrix = Path.GetMatrixFollowing(_dist);
+						_offset = MathExtensions.Geometry.AngleToDir2D(particle.randomSeed % 360.0f)
+							* Get_Value_From_Random_Seed_0t1(particle.randomSeed, 150.0f) * pathWidth;
 
 						if (_particle_system.main.simulationSpace == ParticleSystemSimulationSpace.Local)
 							_particle_array[i].position = transform.worldToLocalMatrix.MultiplyPoint3x4(
-														matrix.MultiplyPoint3x4(Vector3.zero + (Vector3)offset));
+															_matrix.MultiplyPoint3x4(Vector3.zero + (Vector3)_offset));
 						else
-							_particle_array[i].position = matrix.MultiplyPoint3x4(Vector3.zero + (Vector3)offset);
+							_particle_array[i].position = _matrix.MultiplyPoint3x4(Vector3.zero + (Vector3)_offset);
 					}
 				}
 				_particle_system.SetParticles(_particle_array, _numParticles);
