@@ -1,34 +1,40 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace BLINDED_AM_ME._2D{
 
 	[ExecuteInEditMode]
-	public class Parallax2D : MonoBehaviour 
+	[RequireComponent(typeof(Renderer))]
+	public class Parallax2D : MonoBehaviour2
 	{
-
-		public Transform     TargetCam;
-		public Rect Boundaries = new Rect(0, 0, 15, 15);
-		public TwoDeeLayer[] Layers;
-
-		// Use this for initialization
-		void Start () 
+        [SerializeField]
+        [SerializeProperty(nameof(Boundaries))]
+        private Rect _boundaries = new Rect(0, 0, 15, 15);
+		public Rect Boundaries
 		{
-			if( !TargetCam)
-				TargetCam = Camera.main.transform;
+			get => _boundaries;
+			set => SetProperty(ref _boundaries, value);
 		}
-			
-		void LateUpdate()
+
+		public List<TwoDeeLayer> Layers = new List<TwoDeeLayer>();
+
+		public Parallax2D() { }
+        
+		protected override void OnWillRenderObject()
 		{
-			if(!TargetCam)
+			Camera cam = Camera.current;
+			if (!cam)
 				return;
 
 			var pointZero = transform.position - (Vector3)Boundaries.center;
 			var boudary = new Rect(pointZero, Boundaries.size);
-			if(boudary.Contains(TargetCam.position))
-				AdjustLayers(TargetCam.position);
+			if(boudary.Contains(cam.transform.position))
+				AdjustLayers(cam.transform.position);
 
+			base.LateUpdate();
 		}
 
 		Vector3 _displacement;
@@ -38,10 +44,10 @@ namespace BLINDED_AM_ME._2D{
 			_displacement = viewPoint - transform.position;
 			foreach(var layer in Layers)
             {
-				_point = _displacement * layer.multipler;
+				_point = _displacement * layer.multipler + (Vector3)layer.offset;
 				_point.z = layer.transform.position.z;
 
-				layer.transform.transform.position = _point;
+				layer.transform.position = _point;
             }
 		}
 
@@ -58,34 +64,33 @@ namespace BLINDED_AM_ME._2D{
 
 #if UNITY_EDITOR
 
-		void Reset()
+		protected override void Reset()
 		{
-			if (!TargetCam)
-				TargetCam = Camera.main.transform;
-
-			Layers = new TwoDeeLayer[transform.childCount];
-
+			Layers.Clear();
 			for (int i = 0; i < transform.childCount; i++)
 			{
-				Layers[i].transform = transform.GetChild(i);
-				Layers[i].multipler = (float)(i + 1) / ((float)transform.childCount + 1.0f);
+				Layers.Add(new TwoDeeLayer()
+				{
+					transform = transform.GetChild(i),
+					multipler = (float)(i + 1) / ((float)transform.childCount + 1.0f)
+				});
 			}
-		}
 
-		protected virtual void OnDrawGizmos()
+			base.Reset();
+		}
+		protected override void OnDrawGizmos()
 		{
-
 			DrawGizmos(false);
+			base.OnDrawGizmos();
 		}
-
-		protected virtual void OnDrawGizmosSelected()
+		protected override void OnDrawGizmosSelected()
 		{
 			DrawGizmos(true);
+			base.OnDrawGizmosSelected();
 		}
 
 		private void DrawGizmos(bool isSelected)
         {
-			
 			Gizmos.color = isSelected ? Color.red : new Color(1, 0, 0, 0.5f);
 
 			var pointZero = transform.position - (Vector3)Boundaries.center;

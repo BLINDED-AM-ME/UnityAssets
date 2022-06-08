@@ -10,236 +10,145 @@ using System.Collections;
 using System;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using System.ComponentModel;
 
 namespace BLINDED_AM_ME
 {
 	[ExecuteInEditMode]
-	[RequireComponent(typeof(MeshFilter))]
-	[RequireComponent(typeof(MeshRenderer))]
-	public class PortalView : MonoBehaviour 
+	[RequireComponent(typeof(Renderer))]
+	[RequireComponent(typeof(PortalCameraController))]
+	public class PortalView : MonoBehaviour2
 	{
-		public enum ClippingOptions
-        {
-			RelativeToSelf,
-			RelativeToView
-        }
-
-		public Transform exit;
-		public Camera    scoutCamera;
-		public TextureSize targetTextureSize = TextureSize._512;
-		
-		public float           clippingDistance = 0.05f;
-		public ClippingOptions clippingOption = ClippingOptions.RelativeToSelf;
-		public Vector3         clippingNormal = Vector3.forward;
-
-		private PortalViewDataModel _dataModel = new PortalViewDataModel();
-		private MeshRenderer _meshRenderer;
-
-		public PortalView()
-        {
-            _dataModel.PropertyChanged += DataModel_PropertyChanged;
-        }
-
-        private void DataModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-				case nameof(PortalViewDataModel.Material):
-					_meshRenderer.sharedMaterial = _dataModel.Material;
-					break;
-            }
-        }
-
-        private void Reset()
-        {
-			Start();
-        }
-
-        private void Start()
-        {
-			_meshRenderer = GetComponent<MeshRenderer>();
-
-            if (scoutCamera == null)
-            {
-                for (int i = 0; i < transform.childCount; i++)
-                {
-					var child = transform.GetChild(i);
-					var cam = child.GetComponent<Camera>();
-					if (cam)
-					{
-						scoutCamera = cam;
-						break;
-					}
-                }
-            }
-			
-			if (scoutCamera == null)
-            {
-				var obj = new GameObject("ScoutCam", typeof(Camera));
-				scoutCamera = obj.GetComponent<Camera>();
-            }
-
-			_dataModel.ScoutCamera = scoutCamera;
-			_dataModel.TargetTextureSize = targetTextureSize;
-		}
-
-		private Vector4 _clippingPlane = new Vector4();
-        private static bool _isRenderRecursion = false;
-		public void OnWillRenderObject()
+		[SerializeField]
+		[SerializeProperty(nameof(TargetTextureSize))]
+		private TextureSize _targetTextureSize = TextureSize._512;
+		public TextureSize TargetTextureSize
 		{
-			_dataModel.ScoutCamera = scoutCamera;
-			_dataModel.Material = _meshRenderer.sharedMaterial;
-			_dataModel.TargetTextureSize = targetTextureSize;
-
-			Camera cam = Camera.current;
-			if (!cam
-			 || !exit
-			 || !scoutCamera)
-				return;
-
-			// Safeguard from recursion    
-			if (_isRenderRecursion)
-				return;
-
-			var selfToWorld = transform.localToWorldMatrix;
-			var worldToSelf = transform.worldToLocalMatrix;
-			var exitToWorld = exit.localToWorldMatrix;
-			var camToWorld  = cam.transform.localToWorldMatrix;
-			
-			// this will make it depend on the points' position, rotation, and sorry also their scales
-			// best make their scales 1 or equal
-
-			// Scout = Cam's transform from World to Self to Exit
-			scoutCamera.transform.SetPositionAndRotation(
-				exitToWorld.MultiplyPoint3x4(
-					worldToSelf.MultiplyPoint3x4(
-						camToWorld.MultiplyPoint3x4(Vector3.zero))),
-				Quaternion.LookRotation(
-					exitToWorld.MultiplyVector(
-						worldToSelf.MultiplyVector(
-							camToWorld.MultiplyVector(Vector3.forward))),
-					exitToWorld.MultiplyVector(
-						worldToSelf.MultiplyVector(
-							camToWorld.MultiplyVector(Vector3.up)))));
-
-			// I don't know how this works it just does, I got lucky
-			var worldToCam = cam.worldToCameraMatrix;
-			switch (clippingOption)
-			{
-				case ClippingOptions.RelativeToSelf:
-					{
-						var normal = selfToWorld.MultiplyVector(-clippingNormal);
-						_clippingPlane = worldToCam.MultiplyVector(normal);
-						_clippingPlane.w = -Vector3.Dot(
-								worldToCam.MultiplyPoint3x4(
-									selfToWorld.MultiplyPoint3x4(Vector3.zero) + normal * clippingDistance),
-								_clippingPlane);
-					}
-                    break;
-
-				case ClippingOptions.RelativeToView:
-					{
-						_clippingPlane = Vector3.forward;
-						_clippingPlane.w = -Vector3.Dot(
-								worldToCam.MultiplyPoint3x4(
-									selfToWorld.MultiplyPoint3x4(Vector3.zero) + camToWorld.MultiplyVector(Vector3.forward) * clippingDistance),
-								_clippingPlane);
-					}
-					break;
-
-			}
-
-			scoutCamera.projectionMatrix = cam.CalculateObliqueMatrix(_clippingPlane);
-			scoutCamera.enabled = false;// make it manual
-
-			_isRenderRecursion = true;
-			scoutCamera.Render();
-			_isRenderRecursion = false;
+			get => _targetTextureSize;
+			set => SetProperty(ref _targetTextureSize, value);
 		}
 
-		private class PortalViewDataModel : DataModel
+		private RenderTexture _targetTexture;
+		public RenderTexture TargetTexture
+		{
+			get => _targetTexture;
+			set => SetProperty(ref _targetTexture, value);
+		}
+
+		//save to scene
+		[SerializeField]
+		[HideInInspector]
+		private Material _targetMaterial;
+		private Material TargetMaterial
+		{
+			get => _targetMaterial;
+			set => SetProperty(ref _targetMaterial, value);
+		}
+
+		private Renderer _renderer;
+		private PortalCameraController _cameraController;
+		private WeakEventListener<PropertyChangedEventArgs> _cameraController_PropertyChangedListener;
+
+		public PortalView() { }
+
+        protected override void Awake()
         {
-			private Camera _scoutCamera;
-			public Camera ScoutCamera
-			{
-				get => _scoutCamera;
-				set => SetProperty(ref _scoutCamera, value);
-			}
-			
-			private TextureSize _targetTextureSize = TextureSize._32;
-			public TextureSize TargetTextureSize
-			{
-				get => _targetTextureSize;
-				set => SetProperty(ref _targetTextureSize, value);
-			}
+			_cameraController = GetComponent<PortalCameraController>();
 
-			private RenderTexture _targetTexture;
-			public RenderTexture TargetTexture
-			{
-                get => _targetTexture;
-				set
-				{
-					var old = _targetTexture;
-					if (SetProperty(ref _targetTexture, value))
-						if(old != null)
-							old.Release();
-				}
-			}
-			
-			private Material _material;
-			public Material Material
-			{
-				get => _material;
-				set => SetProperty(ref _material, value);
-			}
+			_renderer = GetComponent<Renderer>();
+			_renderer.sharedMaterial = TargetMaterial;
 
-			public PortalViewDataModel()
+            base.Awake();
+        }
+        protected override void OnEnable()
+        {
+			_cameraController_PropertyChangedListener?.OptOut();
+			_cameraController_PropertyChangedListener = new WeakEventListener<PropertyChangedEventArgs>(CameraController_PropertyChanged);
+			
+			if (TryGetComponent(out PortalCameraController cameraController))
+                cameraController.PropertyChanged += _cameraController_PropertyChangedListener.Handle;
+
+            base.OnEnable();
+        }
+        protected override void OnDisable()
+        {
+			if (TryGetComponent(out PortalCameraController cameraController))
+				cameraController.PropertyChanged -= _cameraController_PropertyChangedListener.Handle;
+
+			_cameraController_PropertyChangedListener.OptOut();
+
+			base.OnDisable();
+        }
+		
+        protected override void Start()
+        {
+			TargetTexture = CreateTexture((int)TargetTextureSize);
+
+			base.Start();
+		}
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+			switch (propertyName)
             {
+				case nameof(TargetTextureSize):
+					var old = TargetTexture;
+					TargetTexture = CreateTexture((int)TargetTextureSize);
+					old?.Release();
+					break;
 
+				case nameof(TargetMaterial):
+				case nameof(TargetTexture):
+
+					if (_cameraController?.Camera != null)
+						_cameraController.Camera.targetTexture = TargetTexture;
+
+					if (TargetMaterial != null)
+						TargetMaterial.mainTexture = TargetTexture;
+
+                    break;
             }
 
-            protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+            base.OnPropertyChanged(propertyName);
+        }
+		private void CameraController_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+			var cameraController = (PortalCameraController)sender;
+			switch (e.PropertyName)
+			{
+				case nameof(PortalCameraController.Camera):
+					if (cameraController.Camera != null)
+						cameraController.Camera.targetTexture = TargetTexture;
+					break;
+			}
+		}
+
+		protected override void OnWillRenderObject()
+		{
+			if (_renderer.sharedMaterial != TargetMaterial)
             {
-				switch (propertyName)
-                {
-					case nameof(TargetTextureSize):
-						var targetTexture = new RenderTexture((int)TargetTextureSize, (int)TargetTextureSize, 16, RenderTextureFormat.ARGB32);
-						targetTexture.name = "__PortalRenderTexture" + targetTexture.GetInstanceID();
-						targetTexture.hideFlags = HideFlags.DontSave;
-						targetTexture.Create();
-						TargetTexture = targetTexture;
-						break;
-					
-					case nameof(Material):
-						if (Material == null)
-							break;
-
-						// create an instance
-						var name = _material.name.Split('-').First();
-						_material = new Material(_material);
-						_material.name = name + _material.GetInstanceID(); 
-						
-						if (TargetTexture != null)
-							Material.mainTexture = TargetTexture;
-
-						break;
-
-					case nameof(ScoutCamera):
-					case nameof(TargetTexture):
-						if (TargetTexture == null)
-							break;
-
-                        if (ScoutCamera != null)
-                            ScoutCamera.targetTexture = TargetTexture;
-
-						if (Material != null)
-							Material.mainTexture = TargetTexture;
-
-						break;
+				// create an instance
+				var mat = _renderer.sharedMaterial;
+				if (mat != null)
+				{ 
+					TargetMaterial = new Material(mat);
+					TargetMaterial.name = $"{mat.name} ({TargetMaterial.GetInstanceID()})";
+					_renderer.sharedMaterial = TargetMaterial;
                 }
+                else
+                {
+					TargetMaterial = null;
+                }
+			}
+		}
 
-                base.OnPropertyChanged(propertyName);
-            }
+		public RenderTexture CreateTexture(int size)
+		{
+			var x = new RenderTexture(size, size, 16, RenderTextureFormat.ARGB32);
+			x.name = "__PortalRenderTexture" + x.GetInstanceID();
+			x.hideFlags = HideFlags.DontSave;
+			x.Create();
+			return x;
 		}
 	}
 }

@@ -34,5 +34,6 @@ namespace BLINDED_AM_ME
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
+	
 	}
 }

@@ -13,12 +13,8 @@ namespace BLINDED_AM_ME
 	[RequireComponent(typeof(MeshRenderer))]
 	public class MeshColliderPerMaterial : MonoBehaviour 
 	{
-		public GameObject Output = null;
-
 		public void GenerateColliders()
 		{
-			GameObject outPut = Output != null ? Output : this.gameObject;
-
 			var filter = GetComponent<MeshFilter>();
 			var renderer = GetComponent<MeshRenderer>();
 
@@ -28,7 +24,7 @@ namespace BLINDED_AM_ME
 			Mesh sourceMesh = filter.sharedMesh;
 			var sourceMaker = sourceMesh.ToMeshMaker();
 
-			var existingColliders = outPut.GetComponents<MeshCollider>();
+			var existingColliders = GetComponents<MeshCollider>();
 
 			var colliderEnum = existingColliders.GetEnumerator();
 			var materialEnum = renderer.sharedMaterials.GetEnumerator();
@@ -38,7 +34,7 @@ namespace BLINDED_AM_ME
 				if (colliderEnum.MoveNext())
 					collider = (MeshCollider)colliderEnum.Current;
 				else
-					collider = outPut.AddComponent<MeshCollider>();
+					collider = gameObject.AddComponent<MeshCollider>();
 
 				var x = new List<List<int>>() { submesh };
 				var maker = sourceMaker.ExtractSubmeshes(x);

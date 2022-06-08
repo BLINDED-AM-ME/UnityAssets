@@ -11,20 +11,12 @@ namespace BLINDED_AM_ME
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
-	public class Spline : PathMatricesComponent
+	public class Spline : PathComponent
 	{
 		public Mesh   segmentMesh;
 
-		public Spline()
-        {
-			
-        }
+		public Spline() { }
 		
-		protected override void Start()
-        {
-            base.Start();
-        }
-
 		// UI Thread
 		private CancellationTokenSource _previousTaskCancel;
 		public void GenerateMesh(CancellationToken cancellationToken = default)
@@ -45,8 +37,6 @@ namespace BLINDED_AM_ME
 		// UI Thread
 		private IEnumerator GenerateMeshCoroutine(CancellationToken cancellationToken = default)
 		{
-			UpdatePath();
-
 			var sourceMeshMaker = segmentMesh.ToMeshMaker();
 			var worldToLocal = transform.worldToLocalMatrix;
 			

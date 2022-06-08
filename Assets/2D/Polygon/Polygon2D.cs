@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using BLINDED_AM_ME.Extensions;
+using UnityEngine.Events;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -16,89 +17,75 @@ namespace BLINDED_AM_ME._2D
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
 	[RequireComponent(typeof(PolygonCollider2D))]
-	public class Polygon2D : MonoBehaviour 
+	public class Polygon2D : NotifyTransform
 	{
-
 		// Clockwise
-		private NotifyList<Vector3> _points = new NotifyList<Vector3>() 
-		{ 
-			Vector2.zero, 
-			Vector2.up, 
-			Vector2.one, 
-			Vector2.right 
+		private NotifyList<Vector3> _polygon = new NotifyList<Vector3>()
+		{
+			Vector2.zero,
+			Vector2.up,
+			Vector2.one,
+			Vector2.right
 		};
 
 		public Polygon2D()
-        {
-            _points.CollectionChanged += Points_CollectionChanged;
-        }
-		
-		protected virtual void Start()
 		{
-			if (transform.childCount == 0)
-			{
-				for (int i = 0; i < _points.Count; i++)
-				{
-					Transform obj = new GameObject($"vert {i}").transform;
-					obj.SetParent(transform);
-					obj.localPosition = _points[i];
-
-					if (gameObject.isStatic)
-						obj.gameObject.isStatic = true;
-				}
-
-				GenerateMesh();
-			}
-			else
-			{
-				UpdatePolygon();
-			}
+			_polygon.CollectionChanged += (sender, args) => GenerateMesh();
 		}
 
-		private void Points_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-			GenerateMesh();
-        }
-
-		public void UpdatePolygon()
+        protected override void Start()
 		{
-			Transform[] children = new Transform[transform.childCount];
-			Vector3[] points = new Vector3[children.Length];
+			base.Start();
+			UpdatePolygon();
+		}
 
-			for (int i = 0; i < transform.childCount; i++)
-			{
-				children[i] = transform.GetChild(i);
-				children[i].gameObject.name = "Point " + i;
+		protected override void OnChildAdded(Transform child)
+		{
+			if (!child.TryGetComponent(out NotifyTransform notifyTransform))
+				notifyTransform = child.gameObject.AddComponent<NotifyTransform>();
 
-				points[i] = children[i].localPosition;
-			}
+			notifyTransform.PositionChanged += Child_PositionChanged;
 
-			// Add
-			if (_points.Count < points.Length)
-			{
-				var count = points.Length - _points.Count;
-				var index = points.Length - count;
+			base.OnChildAdded(child);
+			UpdatePolygon();
+		}
+		protected override void OnChildRemoved(Transform child)
+		{
+			if (child.TryGetComponent(out NotifyTransform notifyTransform))
+				notifyTransform.PositionChanged -= Child_PositionChanged;
 
-				var values = new Vector3[count];
-				for (int i = 0; i < count; i++)
-					values[i] = points[index + i];
+			base.OnChildRemoved(child);
+			UpdatePolygon();
+		}
 
-				_points.AddRange(values);
-			}
+		private void Child_PositionChanged(object sender, ItemEventArgs<Vector3> args)
+		{
+			UpdatePolygon();
+		}
 
+		private void UpdatePolygon()
+		{
 			// Remove
-			if (_points.Count > points.Length)
+			if (_polygon.Count > transform.childCount)
 			{
-				var count = _points.Count - points.Length;
-				var index = _points.Count - count;
-				_points.RemoveRange(index, count);
+				var count = _polygon.Count - transform.childCount;
+				var index = _polygon.Count - count;
+				_polygon.RemoveRange(index, count);
 			}
 
-			// Update
-			for (var i = 0; i < points.Length; i++)
-				_points[i] = points[i];
-		}
+			int i = -1;
+			foreach (Transform child in transform)
+            {
+				i++;
+				child.gameObject.name = "Vert " + i;
 
+				if (i < _polygon.Count)
+					_polygon[i] = child.localPosition;
+				else
+					_polygon.Add(child.localPosition);
+            }
+		}
+		
 		// UI Thread
 		private CancellationTokenSource _previousTaskCancel;
 		public void GenerateMesh(CancellationToken cancellationToken = default)
@@ -113,8 +100,6 @@ namespace BLINDED_AM_ME._2D
 		// UI Thread
 		private IEnumerator GenerateMeshCoroutine(CancellationToken cancellationToken = default)
 		{
-			UpdatePolygon();
-
 			var worldToLocal = transform.worldToLocalMatrix;
 			yield return GenerateMeshTaskAsync(worldToLocal, cancellationToken)
 				.WaitForTask((generatedMesh) =>
@@ -122,7 +107,7 @@ namespace BLINDED_AM_ME._2D
 					GetComponent<MeshFilter>().mesh = generatedMesh.ToMesh();
 
 					PolygonCollider2D poly = GetComponent<PolygonCollider2D>();
-					poly.points = _points.Select(p => (Vector2)p).ToArray();
+					poly.points = _polygon.Select(p => (Vector2)p).ToArray();
 				});
 
 		}
@@ -134,47 +119,17 @@ namespace BLINDED_AM_ME._2D
 
 			var targetMesh = new MeshMaker();
 
-			foreach (var point in _points)
+			foreach (var point in _polygon)
 				targetMesh.AddValues(point, point, Vector3.back, Vector4.zero);
 
 			var triangles = await MathExtensions.Geometry.TriangulatePolygonAsync(
-				_points.Select(p => (Vector2)p),
+				_polygon.Select(p => (Vector2)p),
 				cancellationToken);
 
 			targetMesh.Submeshes.Add(triangles.ToList());
 
 			return targetMesh;
 		}
-
-#if UNITY_EDITOR
-
-		protected virtual void OnDrawGizmos()
-		{
-			var childrenCount = transform.childCount;
-			for (int i = 0; i < childrenCount; i++)
-			{
-				if (!UnityEditor.Selection.transforms.Contains(transform.GetChild(i)))
-				{
-					OnDrawGizmosSelected();
-					return;
-				}
-			}
-
-			DrawGizmos(false);
-		}
-
-		protected virtual void OnDrawGizmosSelected()
-		{
-			UpdatePolygon();
-			DrawGizmos(true);
-		}
-
-		private void DrawGizmos(bool isSelected)
-        {
-
-        }
-
-#endif
 
 	}
 }

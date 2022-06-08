@@ -10,13 +10,8 @@ namespace BLINDED_AM_ME
     /// <summary> Serves as a middle man to restrict what can go into another List </summary>
     /// <remarks> You can't cast a collection so here is a work around </remarks>
     /// T must inherit from U
-    public class ListWrapper<T, U> : IList<T>, INotifyCollectionChanged where T : U
+    public class ListWrapper<T, U> : IList<T> where T : U
     {
-        public delegate void ItemEventHandler(object sender, T item);
-        public event ItemEventHandler ItemAdded;
-        public event ItemEventHandler ItemRemoved;
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-        
         private IList<U> _items;
 
         public ListWrapper(IList<U> list)
@@ -27,78 +22,19 @@ namespace BLINDED_AM_ME
         public T this[int index]
         {
             get => (T)_items[index];
-            set
-            {
-                var old = (T)_items[index];
-                _items[index] = value;
-
-                OnItemRemoved(old);
-                OnItemAdded(value);
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, old));
-            }
-        }
-
-        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            CollectionChanged?.Invoke(this, e);
-        }
-        protected virtual void OnItemAdded(T item)
-        {
-            ItemAdded?.Invoke(this, item);
-        }
-        protected virtual void OnItemRemoved(T item)
-        {
-            ItemRemoved?.Invoke(this, item);
+            set => _items[index] = value;
         }
 
         public int Count => _items.Count;
         public bool IsReadOnly => false;
 
-        public void Add(T item)
-        {
-            var oldCount = Count;
-            _items.Add(item);
-            OnItemAdded(item);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
-        }
-        public void Insert(int index, T item)
-        {
-            _items.Insert(index, item);
-            OnItemAdded(item);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
-        }
+        public void Add(T item) => _items.Add(item);
+        public void Insert(int index, T item) => _items.Insert(index, item);
 
-        public bool Remove(T item)
-        {
-            if (_items.Remove(item))
-            {
-                OnItemRemoved(item);
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
-                return true;
-            }
+        public bool Remove(T item) => _items.Remove(item);
+        public void RemoveAt(int index) => _items.RemoveAt(index);
 
-            return false;
-        }
-        public void RemoveAt(int index)
-        {
-            var old = this[index];
-
-            _items.RemoveAt(index);
-
-            OnItemRemoved(old);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, old, index));
-        }
-
-        public void Clear()
-        {
-            var old = _items.ToList();
-            _items.Clear();
-
-            foreach (var x in old)
-                OnItemRemoved((T)x);
-
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, old));
-        }
+        public void Clear() => _items.Clear();
 
         public int IndexOf(T item) => _items.IndexOf(item);
         public bool Contains(T item) => _items.Contains(item);

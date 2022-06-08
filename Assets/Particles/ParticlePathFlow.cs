@@ -12,94 +12,83 @@ namespace BLINDED_AM_ME
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(ParticleSystem))]
-	public class ParticlePathFlow : MonoBehaviour 
+	public class ParticlePathFlow : MonoBehaviour2
 	{
-		public PathMatricesComponent Path;
+		public PathComponent Path;
 		public bool hasRandomStartingPoints = false;
 
 		[Range(0.0f, 5.0f)]
 		public float pathWidth = 0.0f;
 
-		private ParticleSystem.Particle[] _particle_array;
-		private ParticleSystem            _particle_system;
+		private ParticleSystem _particle_system;
 
 		private int _numParticles;
+		private ParticleSystem.Particle[] _particles;
 
-	#if UNITY_EDITOR
-		void Reset()
-		{
-			Start();
-		}
-	#endif
-	
-		void Start()
+		protected override void Start()
 		{
 			_particle_system = GetComponent<ParticleSystem>();
 		}
 
-
-		private float _dist = 0;
+        private float _dist = 0;
 		Matrix4x4 _matrix;
 		Vector2 _offset;
-		void Update () 
+		protected override void Update()
 		{
 			if (Path == null)
 				return;
 
-			if (_particle_array == null
-			 || _particle_array.Length != _particle_system.main.maxParticles)
-				_particle_array = new ParticleSystem.Particle[_particle_system.main.maxParticles];
-				
-			_numParticles = _particle_system.GetParticles(_particle_array);
-			if(_numParticles > 0)
+			var totalDistance = Path.TotalDistance;
+
+			if (_particles == null
+			 || _particles.Length != _particle_system.main.maxParticles)
+				_particles = new ParticleSystem.Particle[_particle_system.main.maxParticles];
+
+			_numParticles = _particle_system.GetParticles(_particles);
+			for (int i = 0; i < _numParticles; i++)
 			{
-				var totalDistance = Path.TotalDistance;
+				var particle = _particles[i];
 
-				for(int i=0; i<_numParticles; i++)
+				// This made it based on the particle lifetime
+				// float normalizedLifetime = (1.0f - obj.remainingLifetime / obj.startLifetime);
+				// 
+				// if(hasRandomStartingPoints){
+				// 	normalizedLifetime += Get_Value_From_Random_Seed_0t1(obj.randomSeed, 100.0f);
+				// 	normalizedLifetime = normalizedLifetime % 1.0f;
+				// }
+				// 
+				// Path_Point axis = _path_comp.GetPathPoint(_path_comp.TotalDistance * normalizedLifetime);
+
+				// This made it based on the paritcle speed
+				_dist = (particle.startLifetime - particle.remainingLifetime) * particle.velocity.magnitude;
+
+				if (hasRandomStartingPoints)
+					_dist += Get_Value_From_Random_Seed_0t1(particle.randomSeed, 100.0f) * totalDistance;
+
+				_dist %= totalDistance;
+
+				if (pathWidth <= 0)
 				{
-					var particle = _particle_array[i];
-
-					// This made it based on the particle lifetime
-					// float normalizedLifetime = (1.0f - obj.remainingLifetime / obj.startLifetime);
-					// 
-					// if(hasRandomStartingPoints){
-					// 	normalizedLifetime += Get_Value_From_Random_Seed_0t1(obj.randomSeed, 100.0f);
-					// 	normalizedLifetime = normalizedLifetime % 1.0f;
-					// }
-					// 
-					// Path_Point axis = _path_comp.GetPathPoint(_path_comp.TotalDistance * normalizedLifetime);
-
-					// This made it based on the paritcle speed
-					_dist = (particle.startLifetime - particle.remainingLifetime) * particle.velocity.magnitude;
-
-					if (hasRandomStartingPoints)
-						_dist += Get_Value_From_Random_Seed_0t1(particle.randomSeed, 100.0f) * totalDistance;
-
-					_dist %= totalDistance;
-
-					if (pathWidth <= 0)
-                    {
-						if (_particle_system.main.simulationSpace == ParticleSystemSimulationSpace.Local)
-							_particle_array[i].position = transform.worldToLocalMatrix.MultiplyPoint3x4(Path.GetPoint(_dist));
-						else
-							_particle_array[i].position = Path.GetPoint(_dist);
-					}
+					if (_particle_system.main.simulationSpace == ParticleSystemSimulationSpace.Local)
+						_particles[i].position = transform.worldToLocalMatrix.MultiplyPoint3x4(Path.GetPoint(_dist));
 					else
-                    {
-						_matrix = Path.GetMatrixFollowing(_dist);
-						_offset = MathExtensions.Geometry.AngleToDir2D(particle.randomSeed % 360.0f)
-							* Get_Value_From_Random_Seed_0t1(particle.randomSeed, 150.0f) * pathWidth;
-
-						if (_particle_system.main.simulationSpace == ParticleSystemSimulationSpace.Local)
-							_particle_array[i].position = transform.worldToLocalMatrix.MultiplyPoint3x4(
-															_matrix.MultiplyPoint3x4(Vector3.zero + (Vector3)_offset));
-						else
-							_particle_array[i].position = _matrix.MultiplyPoint3x4(Vector3.zero + (Vector3)_offset);
-					}
+						_particles[i].position = Path.GetPoint(_dist);
 				}
-				_particle_system.SetParticles(_particle_array, _numParticles);
+				else
+				{
+					_matrix = Path.GetMatrixFollowing(_dist);
+					_offset = MathExtensions.Geometry.AngleToDir2D(particle.randomSeed % 360.0f)
+						* Get_Value_From_Random_Seed_0t1(particle.randomSeed, 150.0f) * pathWidth;
+
+					if (_particle_system.main.simulationSpace == ParticleSystemSimulationSpace.Local)
+						_particles[i].position = transform.worldToLocalMatrix.MultiplyPoint3x4(
+														_matrix.MultiplyPoint3x4(Vector3.zero + (Vector3)_offset));
+					else
+						_particles[i].position = _matrix.MultiplyPoint3x4(Vector3.zero + (Vector3)_offset);
+				}
 			}
-		}		
+			_particle_system.SetParticles(_particles, _numParticles);
+		}
 
 		private float Get_Value_From_Random_Seed_0t1(float seed, float converter)
 		{

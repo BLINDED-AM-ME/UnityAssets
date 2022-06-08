@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using BLINDED_AM_ME.Extensions;
 using System.Linq;
 using System.Collections.Specialized;
+using System.Runtime.CompilerServices;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,52 +18,85 @@ namespace BLINDED_AM_ME._2D
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
-	public class Spline2D : PathMatricesComponent
+	public class Spline2D : PathComponent
 	{
+		[SerializeField]
 		[Range(0.1f, 5.0f)]
-		public float SegmentLength = 1.0f;
-		[Range(0.01f, 5.0f)]
-		public float SegmentHeight = 1.0f;
-		[Range(-1.0f, 1.0f)]
-		public float Offset = 0.0f;
-
-		[Range(0.01f, 1.0f)]
-		public float ColliderHeight = 1f;
-		[Range(-1.0f, 1.0f)]
-		public float ColliderOffset = 0f;
-
-		public enum ColliderType { Edge, Polygon };
-		public ColliderType colliderType = ColliderType.Edge;
-
-		protected override void Start()
+		private float _segmentLength = 1.0f;
+		public float SegmentLength
 		{
-			//base.Start();
-
-			if (transform.childCount == 0)
-			{
-				Transform obj = null;
-
-				// make the children
-				obj = new GameObject("point1").transform;
-				obj.SetParent(transform);
-				obj.localPosition = Vector3.left;
-
-				if (gameObject.isStatic)
-					obj.gameObject.isStatic = true;
-
-				obj = new GameObject("point2").transform;
-				obj.SetParent(transform);
-				obj.localPosition = Vector3.right;
-
-				if (gameObject.isStatic)
-					obj.gameObject.isStatic = true;
-
-
-			}
-
-			UpdatePath();
+			get => _segmentLength;
+			set => SetProperty(ref _segmentLength, value);
 		}
 
+		[SerializeField]
+		[Range(0.01f, 5.0f)]
+		private float _segmentHeight = 1.0f;
+		public float SegmentHeight
+		{
+			get => _segmentHeight;
+			set => SetProperty(ref _segmentHeight, value);
+		}
+
+		[SerializeField]
+		[Range(-1.0f, 1.0f)]
+		private float _offset = 0.0f;
+		public float Offset
+		{
+			get => _offset;
+			set => SetProperty(ref _offset, value);
+		}
+
+		[SerializeField]
+		[Range(0.01f, 1.0f)]
+		private float _colliderHeight = 1f;
+		public float ColliderHeight
+		{
+			get => _colliderHeight;
+			set => SetProperty(ref _colliderHeight, value);
+		}
+
+		[SerializeField]
+		[Range(-1.0f, 1.0f)]
+		private float _colliderOffset = 0f;
+		public float ColliderOffset
+		{
+			get => _colliderOffset;
+			set => SetProperty(ref _colliderOffset, value);
+		}
+
+		public enum ColliderType { Edge, Polygon };
+		[SerializeField]
+		private ColliderType _colliderType = ColliderType.Edge;
+		public ColliderType Collider
+		{
+			get => _colliderType;
+			set => SetProperty(ref _colliderType, value);
+		}
+		 
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+			switch (propertyName)
+			{
+				case nameof(ColliderHeight):
+				case nameof(ColliderOffset):
+				case nameof(Collider):
+					GenerateCollider(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
+					break;
+
+				default:
+					GenerateMesh(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
+					break;
+			}
+
+			base.OnPropertyChanged(propertyName);
+        }
+		protected override void OnPathChanged()
+        {
+			base.OnPathChanged();
+			GenerateMesh(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
+        }
+		
 		// UI Thread
 		private CancellationTokenSource _previousTaskCancel;
 		public void GenerateMesh(CancellationToken cancellationToken = default)
@@ -77,8 +111,6 @@ namespace BLINDED_AM_ME._2D
 		// UI Thread
 		private IEnumerator GenerateMeshCoroutine(CancellationToken cancellationToken = default)
 		{
-			UpdatePath();
-
 			var worldToLocal = transform.worldToLocalMatrix;
 			yield return GenerateMeshTaskAsync(worldToLocal, cancellationToken)
 				.WaitForTask((generatedMesh) =>
@@ -166,13 +198,11 @@ namespace BLINDED_AM_ME._2D
 		// UI Thread
 		private IEnumerator GenerateColliderCoroutine(CancellationToken cancellationToken = default)
 		{
-			UpdatePath();
-
 			var worldToLocal = transform.worldToLocalMatrix;
 			yield return GenerateColliderTaskAsync(worldToLocal, cancellationToken)
 				.WaitForTask((colliderPoints) =>
 				{
-					if (colliderType == ColliderType.Edge)
+					if (Collider == ColliderType.Edge)
 					{
 
 #if UNITY_EDITOR
@@ -244,7 +274,7 @@ namespace BLINDED_AM_ME._2D
 					bottomColliderPoints.Add(worldToLocal.MultiplyPoint3x4(matrix.MultiplyPoint3x4(colliderDown)));
 				}
 
-				if (colliderType == ColliderType.Edge)
+				if (Collider == ColliderType.Edge)
 				{
 					return topColliderPoints.ToArray();
 				}
@@ -257,120 +287,6 @@ namespace BLINDED_AM_ME._2D
 				}
 			});
 		}
-
-#if UNITY_EDITOR
-
-		// this is why we want Properties instead of fields UNITY!!!!!
-		private PropertyWatcher _propertyWatcher = new PropertyWatcher();
-
-		public Spline2D()
-		{
-			_propertyWatcher.PropertyChanged += PropertyWatcher_PropertyChanged;
-		}
-        
-        protected override void OnDrawGizmos()
-		{
-			base.OnDrawGizmos();
-		}
-		protected override void OnDrawGizmosSelected()
-		{
-			// this is why we want Properties instead of fields UNITY!!!!!
-			_propertyWatcher.IsSmooth = isSmooth;
-			_propertyWatcher.IsCircuit = isCircuit;
-			_propertyWatcher.SegmentLength = SegmentLength;
-			_propertyWatcher.SegmentHeight = SegmentHeight;
-			_propertyWatcher.Offset = Offset;
-			_propertyWatcher.ColliderHeight = ColliderHeight;
-			_propertyWatcher.ColliderOffset = ColliderOffset;
-			_propertyWatcher.ColliderType = colliderType;
-
-			base.OnDrawGizmosSelected();
-		}
-
-        protected override void OnPathChanged()
-        {
-            base.OnPathChanged();
-			GenerateMesh(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
-        }
-		
-		// this is why we want Properties instead of fields UNITY!!!!!
-		private void PropertyWatcher_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			switch (e.PropertyName)
-			{
-				case nameof(PropertyWatcher.ColliderHeight):
-				case nameof(PropertyWatcher.ColliderOffset):
-				case nameof(PropertyWatcher.ColliderType):
-					GenerateCollider(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
-					break;
-
-				default:
-					GenerateMesh(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
-					break;
-			}
-		}
-
-		// this is why we want Properties instead of fields UNITY!!!!!
-		private class PropertyWatcher : DataModel
-		{
-			private bool _isSmooth = true;
-			public bool IsSmooth
-			{
-				get => _isSmooth;
-				set => SetProperty(ref _isSmooth, value);
-			}
-			
-			private bool _isCircuit = false;
-			public bool IsCircuit
-			{
-				get => _isCircuit;
-				set => SetProperty(ref _isCircuit, value);
-			}
-
-			private float _segmentLength = 1.0f;
-			public float SegmentLength
-			{
-				get => _segmentLength;
-				set => SetProperty(ref _segmentLength, value);
-			}
-			
-			private float _segmentHeight = 1.0f;
-			public float SegmentHeight
-			{
-				get => _segmentHeight;
-				set => SetProperty(ref _segmentHeight, value);
-			}
-
-			private float _offset = 0.0f;
-			public float Offset
-			{
-				get => _offset;
-				set => SetProperty(ref _offset, value);
-			}
-
-			private float _colliderHeight = 1f;
-			public float ColliderHeight
-			{
-				get => _colliderHeight;
-				set => SetProperty(ref _colliderHeight, value);
-			}
-
-			private float _colliderOffset = 0f;
-			public float ColliderOffset
-			{
-				get => _colliderOffset;
-				set => SetProperty(ref _colliderOffset, value);
-			}
-
-			private ColliderType _colliderType;
-			public ColliderType ColliderType
-			{
-				get => _colliderType;
-				set => SetProperty(ref _colliderType, value);
-			}
-		}
-
-#endif
 
 	}
 }

@@ -5,19 +5,29 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using BLINDED_AM_ME.Extensions;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace BLINDED_AM_ME
 {
+   
+    public abstract class NotifyList { }
+
     /// <summary> List with events </summary>
     /// <remarks> Because ObservableCollection does not give the items when Clear() is called </remarks>
     /// <typeparam name="T"></typeparam>
-    public class NotifyList<T> : IList<T>, IList, INotifyCollectionChanged
+    [Serializable]
+    public class NotifyList<T> : NotifyList, IList<T>, IList, INotifyCollectionChanged, ISerializationCallbackReceiver
     {
-        public event EventHandler<T> ItemAdded;
-        public event EventHandler<T> ItemRemoved;
+        public event ItemEventHandler<T> ItemAdded;
+        public event ItemEventHandler<T> ItemRemoved;
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        private List<T> _items;
+        private List<T> _items = new List<T>();
 
         public T this[int index]
         {
@@ -66,19 +76,19 @@ namespace BLINDED_AM_ME
             _items = new List<T>(collection);
         }
 
-        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            CollectionChanged?.Invoke(this, e);
-        }
         protected virtual void OnItemAdded(T item)
         {
-            ItemAdded?.Invoke(this, item);
+            ItemAdded?.Invoke(this, new ItemEventArgs<T>(item));
         }
         protected virtual void OnItemRemoved(T item)
         {
-            ItemRemoved?.Invoke(this, item);
+            ItemRemoved?.Invoke(this, new ItemEventArgs<T>(item));
         }
-
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
+        {
+            CollectionChanged?.Invoke(this, args);
+        }
+        
         public int Count => _items.Count;
         public bool IsReadOnly => false;
         public bool IsFixedSize => ((IList)_items).IsFixedSize;
@@ -190,5 +200,37 @@ namespace BLINDED_AM_ME
         public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
 
+        [SerializeField]
+        private List<T> _serializableItems = new List<T>();
+        public void OnBeforeSerialize()
+        {
+            _serializableItems.Clear();
+            foreach (T item in _items)
+                _serializableItems.Add(item);
+        }
+        public void OnAfterDeserialize()
+        {
+            this.Match(_serializableItems);
+        }
+    
     }
+
+#if UNITY_EDITOR
+    [CustomPropertyDrawer(typeof(NotifyList), true)]
+    public class NotifyListDrawer : PropertyDrawer
+    {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            var list = property.FindPropertyRelative("_serializableItems");
+            EditorGUI.PropertyField(position, list, label, true);
+        }
+
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            var list = property.FindPropertyRelative("_serializableItems");
+            return EditorGUI.GetPropertyHeight(list, label, true);
+        }
+    }
+#endif
+
 }
