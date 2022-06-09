@@ -21,6 +21,7 @@ namespace BLINDED_AM_ME._2D
 	public class Spline2D : PathComponent
 	{
 		[SerializeField]
+		[SerializeProperty(nameof(SegmentLength))]
 		[Range(0.1f, 5.0f)]
 		private float _segmentLength = 1.0f;
 		public float SegmentLength
@@ -30,6 +31,7 @@ namespace BLINDED_AM_ME._2D
 		}
 
 		[SerializeField]
+		[SerializeProperty(nameof(SegmentHeight))]
 		[Range(0.01f, 5.0f)]
 		private float _segmentHeight = 1.0f;
 		public float SegmentHeight
@@ -39,6 +41,7 @@ namespace BLINDED_AM_ME._2D
 		}
 
 		[SerializeField]
+		[SerializeProperty(nameof(Offset))]
 		[Range(-1.0f, 1.0f)]
 		private float _offset = 0.0f;
 		public float Offset
@@ -48,6 +51,7 @@ namespace BLINDED_AM_ME._2D
 		}
 
 		[SerializeField]
+		[SerializeProperty(nameof(ColliderHeight))]
 		[Range(0.01f, 1.0f)]
 		private float _colliderHeight = 1f;
 		public float ColliderHeight
@@ -57,6 +61,7 @@ namespace BLINDED_AM_ME._2D
 		}
 
 		[SerializeField]
+		[SerializeProperty(nameof(ColliderOffset))]
 		[Range(-1.0f, 1.0f)]
 		private float _colliderOffset = 0f;
 		public float ColliderOffset
@@ -67,6 +72,7 @@ namespace BLINDED_AM_ME._2D
 
 		public enum ColliderType { Edge, Polygon };
 		[SerializeField]
+		[SerializeProperty(nameof(Collider))]
 		private ColliderType _colliderType = ColliderType.Edge;
 		public ColliderType Collider
 		{

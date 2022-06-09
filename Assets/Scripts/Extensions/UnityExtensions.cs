@@ -129,8 +129,8 @@ namespace BLINDED_AM_ME
 
 			label = EditorGUI.BeginProperty(position, label, property);
 
-			// Starts a new code block to check for GUI changes.
-			EditorGUI.BeginChangeCheck();
+            // Starts a new code block to check for GUI changes.
+            EditorGUI.BeginChangeCheck();
 
 			var targetObject = property.serializedObject.targetObject;
 			var targetAttribute = (SerializeProperty)attribute;
