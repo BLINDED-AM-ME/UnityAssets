@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Specialized;
+using BLINDED_AM_ME.Objects;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Components
 {
 	[ExecuteInEditMode]
-	public class PathComponent : NotifyTransform
+	public class Path : NotifyTransform
 	{
 		[SerializeField]
 		[SerializeProperty(nameof(IsSmooth))]
@@ -35,14 +36,14 @@ namespace BLINDED_AM_ME
 			set => SetProperty(ref _isCircuit, value);
 		}
 
-		public Path Path { get; } = new Path();
-		public float TotalDistance => Path.GetTotalDistance(_isCircuit);
+		public Objects.Path PathObject { get; } = new Objects.Path();
+		public float TotalDistance => PathObject.GetTotalDistance(_isCircuit);
 
 		public event EventHandler PathChanged;
 
-		public PathComponent()
+		public Path()
         {
-            Path.CollectionChanged += (sender, args) => OnPathChanged();
+            PathObject.CollectionChanged += (sender, args) => OnPathChanged();
 		}
 
 		protected override void Start()
@@ -86,11 +87,11 @@ namespace BLINDED_AM_ME
         public void UpdatePath()
         {
 			// Remove
-			if (Path.Count > transform.childCount)
+			if (PathObject.Count > transform.childCount)
 			{
-				var count = Path.Count - transform.childCount;
-				var index = Path.Count - count;
-				Path.RemoveRange(index, count);
+				var count = PathObject.Count - transform.childCount;
+				var index = PathObject.Count - count;
+				PathObject.RemoveRange(index, count);
 			}
 
 			int i = -1;
@@ -99,10 +100,10 @@ namespace BLINDED_AM_ME
 				i++;
 				child.gameObject.name = "Point " + i;
 
-				if (i < Path.Count)
-					Path[i] = child.localToWorldMatrix;
+				if (i < PathObject.Count)
+					PathObject[i] = child.localToWorldMatrix;
 				else
-					Path.Add(child.localToWorldMatrix);
+					PathObject.Add(child.localToWorldMatrix);
 			}
         }
         
@@ -113,29 +114,29 @@ namespace BLINDED_AM_ME
 
 		public Vector3 GetPoint(float distance)
 		{
-			return Path.GetPoint(distance, IsSmooth, IsCircuit);
+			return PathObject.GetPoint(distance, IsSmooth, IsCircuit);
 		}
 		/// <summary> Following the Path </summary>
 		/// <remarks> MultiplyVector(Vector3.forward) will point along the path</remarks>
 		/// <returns> a Matrix dependent on the up axis of nearby Matrices </returns>
 		public Matrix4x4 GetMatrixFollowing(float distance)
         {
-			return Path.GetMatrixFollowing(distance, IsSmooth, IsCircuit);
+			return PathObject.GetMatrixFollowing(distance, IsSmooth, IsCircuit);
         }
 		/// <returns> A fully blended Matrix </returns>
 		public Matrix4x4 GetMatrixRaw(float distance)
         {
-			return Path.GetMatrixRaw(distance, IsSmooth, IsCircuit);
+			return PathObject.GetMatrixRaw(distance, IsSmooth, IsCircuit);
         }
 		/// <summary> Following the Path </summary>
 		/// <remarks> forward will point along the path </remarks>
 		public void GetAxesFollowing(float distance, out Vector3 origin, out Vector3 right, out Vector3 up, out Vector3 forward)
 		{
-			Path.GetAxesFollowing(distance, IsSmooth, IsCircuit, out origin, out right, out up, out forward);
+			PathObject.GetAxesFollowing(distance, IsSmooth, IsCircuit, out origin, out right, out up, out forward);
 		}
 		public void GetAxesRaw(float distance, out Vector3 origin, out Vector3 right, out Vector3 up, out Vector3 forward)
 		{
-			Path.GetAxesRaw(distance, IsSmooth, IsCircuit, out origin, out right, out up, out forward);
+			PathObject.GetAxesRaw(distance, IsSmooth, IsCircuit, out origin, out right, out up, out forward);
 		}
 
 #if UNITY_EDITOR
@@ -169,23 +170,23 @@ namespace BLINDED_AM_ME
 
 		private void DrawGizmos(bool isSelected)
 		{
-			if (Path.Count < 2)
+			if (PathObject.Count < 2)
 				return;
 
-			var pathPoints = (IList<Vector3>)Path;
+			var pathPoints = (IList<Vector3>)PathObject;
 
 			if (!IsSmooth)
 			{
 				Gizmos.color = isSelected ? new Color(0, 1, 1, 1) : new Color(0, 1, 1, 0.5f);
 
-				for (var i = 0; i < Path.Count - 1; i++)
+				for (var i = 0; i < PathObject.Count - 1; i++)
 					Gizmos.DrawLine(pathPoints[i], pathPoints[i + 1]);
 
 				if (IsCircuit)
 					Gizmos.DrawLine(pathPoints.First(), pathPoints.Last());
 			}
 
-			var maxDistance = Path.GetTotalDistance(IsCircuit);
+			var maxDistance = PathObject.GetTotalDistance(IsCircuit);
 
 			Vector3 prevPoint = Gizmo_DrawAxes(0, isSelected);
 			Vector3 nextPoint;

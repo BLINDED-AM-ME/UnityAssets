@@ -12,7 +12,7 @@ using BLINDED_AM_ME.Extensions;
 using UnityEditor;
 #endif
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Components
 {
 	/// <summary> I want to use Overrides and Properties </summary>
 	public class MonoBehaviour2 : MonoBehaviour, INotifyPropertyChanged

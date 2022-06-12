@@ -11,14 +11,33 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using System.ComponentModel;
+using BLINDED_AM_ME.Objects;
 
 namespace BLINDED_AM_ME
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(Renderer))]
 	[RequireComponent(typeof(PortalCameraController))]
-	public class PortalView : MonoBehaviour2
+	public class PortalView : Components.MonoBehaviour2
 	{
+		public enum TextureSize
+		{
+			[InspectorName("32")]
+			_32 = 32,
+			[InspectorName("64")]
+			_64 = 64,
+			[InspectorName("128")]
+			_128 = 128,
+			[InspectorName("256")]
+			_256 = 256,
+			[InspectorName("512")]
+			_512 = 512,
+			[InspectorName("1024")]
+			_1024 = 1024,
+			[InspectorName("2048")]
+			_2048 = 2048
+		}
+
 		[SerializeField]
 		[SerializeProperty(nameof(TargetTextureSize))]
 		private TextureSize _targetTextureSize = TextureSize._512;

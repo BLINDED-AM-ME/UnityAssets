@@ -7,52 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Objects
 {
-    /// <summary> not used but good to know </summary> 
-    public struct MeshIndexValues
-    {
-        public Vector3 Vertex { get; set; }
-        public Vector2 Uv { get; set; }
-        public Vector3 Normal { get; set; }
-        public Vector4 Tangent { get; set; }
-
-        public static bool operator ==(MeshIndexValues x, MeshIndexValues y)
-        {
-            return x.Equals(y);
-        }
-        public static bool operator !=(MeshIndexValues x, MeshIndexValues y)
-        {
-            return !x.Equals(y);
-        }
-
-        public override bool Equals(object obj)
-        {
-            //return base.Equals(obj);
-
-            if (obj is MeshIndexValues meshIndexValues
-             && Vertex == meshIndexValues.Vertex
-             && Uv == meshIndexValues.Uv
-             && Normal == meshIndexValues.Normal
-             && Tangent == meshIndexValues.Tangent)
-                return true;
-            else
-                return false;
-        }
-        public override int GetHashCode()
-        {
-            // The example displays the following output: x ^ y
-            // 5 ^ 8 = 13
-            // 8 ^ 5 = 13
-
-            // Tuple.Create(x, y).GetHashCode(); may significantly impact the overall performance
-            // 5, 8 = 173
-            // 8, 5 = 269
-
-            return base.GetHashCode();
-        }
-    }
-
+    
     public class MeshMaker
     {
         // Mesh Values
@@ -359,4 +316,49 @@ namespace BLINDED_AM_ME
         }
 #endif
     }
+
+    /// <summary> not used but good to know </summary> 
+    public struct MeshIndexValues
+    {
+        public Vector3 Vertex { get; set; }
+        public Vector2 Uv { get; set; }
+        public Vector3 Normal { get; set; }
+        public Vector4 Tangent { get; set; }
+
+        public static bool operator ==(MeshIndexValues x, MeshIndexValues y)
+        {
+            return x.Equals(y);
+        }
+        public static bool operator !=(MeshIndexValues x, MeshIndexValues y)
+        {
+            return !x.Equals(y);
+        }
+
+        public override bool Equals(object obj)
+        {
+            //return base.Equals(obj);
+
+            if (obj is MeshIndexValues meshIndexValues
+             && Vertex == meshIndexValues.Vertex
+             && Uv == meshIndexValues.Uv
+             && Normal == meshIndexValues.Normal
+             && Tangent == meshIndexValues.Tangent)
+                return true;
+            else
+                return false;
+        }
+        public override int GetHashCode()
+        {
+            // The example displays the following output: x ^ y
+            // 5 ^ 8 = 13
+            // 8 ^ 5 = 13
+
+            // Tuple.Create(x, y).GetHashCode(); may significantly impact the overall performance
+            // 5, 8 = 173
+            // 8, 5 = 269
+
+            return base.GetHashCode();
+        }
+    }
+
 }

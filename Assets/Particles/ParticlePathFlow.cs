@@ -12,9 +12,9 @@ namespace BLINDED_AM_ME
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(ParticleSystem))]
-	public class ParticlePathFlow : MonoBehaviour2
+	public class ParticlePathFlow : Components.MonoBehaviour2
 	{
-		public PathComponent Path;
+		public Components.Path Path;
 		public bool hasRandomStartingPoints = false;
 
 		[Range(0.0f, 5.0f)]

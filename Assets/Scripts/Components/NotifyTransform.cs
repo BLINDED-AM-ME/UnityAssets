@@ -1,4 +1,5 @@
 using BLINDED_AM_ME.Extensions;
+using BLINDED_AM_ME.Objects;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Components
 {
     [ExecuteInEditMode]
     public class NotifyTransform : MonoBehaviour2

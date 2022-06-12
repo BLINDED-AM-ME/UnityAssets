@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using BLINDED_AM_ME.Extensions;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Objects
 {
 	/// <summary> Matrices contain origin, rotation, and scale </summary>
 	public class Path : NotifyList<Matrix4x4>, IList<Vector3>

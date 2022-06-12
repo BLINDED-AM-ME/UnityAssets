@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Objects
 {
     public class ItemEventArgs : EventArgs
     {

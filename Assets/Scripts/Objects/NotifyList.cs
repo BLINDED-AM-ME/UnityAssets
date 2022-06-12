@@ -12,7 +12,7 @@ using BLINDED_AM_ME.Extensions;
 using UnityEditor;
 #endif
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Objects
 {
    
     public abstract class NotifyList { }

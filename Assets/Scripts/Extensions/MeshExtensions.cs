@@ -1,3 +1,4 @@
+using BLINDED_AM_ME.Objects;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -459,11 +460,11 @@ namespace BLINDED_AM_ME.Extensions
             Vector2 uv_AB = uv_2 - uv_1;
             Vector2 uv_AC = uv_3 - uv_1;
 
-            Vector3 tan1 = new Vector3(
+            Vector3 tan1 = new(
                 uv_AC.y * v_AB.x - uv_AB.y * v_AC.x,
                 uv_AC.y * v_AB.y - uv_AB.y * v_AC.y,
                 uv_AC.y * v_AB.z - uv_AB.y * v_AC.z);
-            Vector3 tan2 = new Vector3(
+            Vector3 tan2 = new(
                 uv_AB.x * v_AC.x - uv_AC.x * v_AB.x,
                 uv_AB.x * v_AC.y - uv_AC.x * v_AB.y,
                 uv_AB.x * v_AC.z - uv_AC.x * v_AB.z);

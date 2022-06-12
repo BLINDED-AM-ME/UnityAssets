@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Objects
 {
     /// <summary> Holds a weak reference to the subscriber </summary>
     [DebuggerNonUserCode]

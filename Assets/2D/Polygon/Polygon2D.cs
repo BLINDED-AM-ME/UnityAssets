@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using BLINDED_AM_ME.Extensions;
 using UnityEngine.Events;
+using BLINDED_AM_ME.Objects;
+using BLINDED_AM_ME.Components;
 
 #if UNITY_EDITOR
 using UnityEditor;

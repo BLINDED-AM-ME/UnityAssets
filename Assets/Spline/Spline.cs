@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using BLINDED_AM_ME.Extensions;
+using BLINDED_AM_ME.Objects;
 
 namespace BLINDED_AM_ME
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
-	public class Spline : PathComponent
+	public class Spline : Components.Path
 	{
 		public Mesh   segmentMesh;
 

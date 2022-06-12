@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Objects
 {
 	// This is why we want properties instead of feilds in the inspector
 	public class DataModel : INotifyPropertyChanged

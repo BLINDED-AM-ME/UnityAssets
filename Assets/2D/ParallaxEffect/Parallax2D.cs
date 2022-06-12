@@ -8,7 +8,7 @@ namespace BLINDED_AM_ME._2D{
 
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(Renderer))]
-	public class Parallax2D : MonoBehaviour2
+	public class Parallax2D : Components.MonoBehaviour2
 	{
         [SerializeField]
         [SerializeProperty(nameof(Boundaries))]

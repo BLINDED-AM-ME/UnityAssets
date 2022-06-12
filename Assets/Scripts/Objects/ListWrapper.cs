@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Objects
 {
     /// <summary> Serves as a middle man to restrict what can go into another List </summary>
     /// <remarks> You can't cast a collection so here is a work around </remarks>

@@ -8,6 +8,7 @@ using BLINDED_AM_ME.Extensions;
 using System.Linq;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
+using BLINDED_AM_ME.Objects;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,7 +19,7 @@ namespace BLINDED_AM_ME._2D
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
-	public class Spline2D : PathComponent
+	public class Spline2D : Components.Path
 	{
 		[SerializeField]
 		[SerializeProperty(nameof(SegmentLength))]
