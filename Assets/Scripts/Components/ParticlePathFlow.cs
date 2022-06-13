@@ -8,13 +8,13 @@ using BLINDED_AM_ME.Extensions;
 using UnityEditor;
 #endif
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Components
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(ParticleSystem))]
-	public class ParticlePathFlow : Components.MonoBehaviour2
+	public class ParticlePathFlow : MonoBehaviour2
 	{
-		public Components.Path Path;
+		public Path Path;
 		public bool hasRandomStartingPoints = false;
 
 		[Range(0.0f, 5.0f)]
@@ -76,7 +76,7 @@ namespace BLINDED_AM_ME
 				}
 				else
 				{
-					_matrix = Path.GetMatrixFollowing(_dist);
+					_matrix = Path.GetMatrix(_dist);
 					_offset = MathExtensions.Geometry.AngleToDir2D(particle.randomSeed % 360.0f)
 						* Get_Value_From_Random_Seed_0t1(particle.randomSeed, 150.0f) * pathWidth;
 

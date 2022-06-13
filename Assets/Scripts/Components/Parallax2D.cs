@@ -4,11 +4,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 
-namespace BLINDED_AM_ME._2D{
+namespace BLINDED_AM_ME.Components
+{
 
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(Renderer))]
-	public class Parallax2D : Components.MonoBehaviour2
+	public class Parallax2D : MonoBehaviour2
 	{
         [SerializeField]
         [SerializeProperty(nameof(Boundaries))]

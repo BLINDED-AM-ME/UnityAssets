@@ -13,12 +13,12 @@ using System.Linq;
 using System.ComponentModel;
 using BLINDED_AM_ME.Objects;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Components
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(Renderer))]
 	[RequireComponent(typeof(PortalCameraController))]
-	public class PortalView : Components.MonoBehaviour2
+	public class PortalView : MonoBehaviour2
 	{
 		public enum TextureSize
 		{

@@ -13,7 +13,7 @@ using BLINDED_AM_ME.Components;
 using UnityEditor;
 #endif
 
-namespace BLINDED_AM_ME._2D
+namespace BLINDED_AM_ME.Components
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(MeshFilter))]
@@ -106,7 +106,7 @@ namespace BLINDED_AM_ME._2D
 			yield return GenerateMeshTaskAsync(worldToLocal, cancellationToken)
 				.WaitForTask((generatedMesh) =>
 				{
-					GetComponent<MeshFilter>().mesh = generatedMesh.ToMesh();
+					GetComponent<MeshFilter>().mesh = generatedMesh.GetMesh();
 
 					PolygonCollider2D poly = GetComponent<PolygonCollider2D>();
 					poly.points = _polygon.Select(p => (Vector2)p).ToArray();

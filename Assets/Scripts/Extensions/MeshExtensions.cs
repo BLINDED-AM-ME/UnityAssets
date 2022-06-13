@@ -43,11 +43,11 @@ namespace BLINDED_AM_ME.Extensions
             // Comes back with result
 
             // Left Mesh
-            Mesh left_HalfMesh = pieces.Item1.ToMesh();
+            Mesh left_HalfMesh = pieces.Item1.GetMesh();
             left_HalfMesh.name = "Split Mesh Left";
 
             // Right Mesh
-            Mesh right_HalfMesh = pieces.Item2.ToMesh();
+            Mesh right_HalfMesh = pieces.Item2.GetMesh();
             right_HalfMesh.name = "Split Mesh Right";
 
             return new Tuple<Mesh, Mesh>(left_HalfMesh, right_HalfMesh);
@@ -66,11 +66,11 @@ namespace BLINDED_AM_ME.Extensions
                 // comes back to UI thread
 
                 // Left Mesh
-                Mesh left_HalfMesh = pieces.Item1.ToMesh();
+                Mesh left_HalfMesh = pieces.Item1.GetMesh();
                 left_HalfMesh.name = "Split Mesh Left";
 
                 // Right Mesh
-                Mesh right_HalfMesh = pieces.Item2.ToMesh();
+                Mesh right_HalfMesh = pieces.Item2.GetMesh();
                 right_HalfMesh.name = "Split Mesh Right";
 
                 callback.Invoke(new Tuple<Mesh, Mesh>(left_HalfMesh, right_HalfMesh));

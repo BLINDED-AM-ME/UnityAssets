@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Components
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(Renderer))]
-	public class PortalCameraController : Components.MonoBehaviour2
+	public class PortalCameraController : MonoBehaviour2
 	{
 		public enum ClippingOptions
 		{
-			RelativeToSelf,
-			RelativeToView
+			RelativeToObject,
+			RelativeToCamera
 		}
 
 		[SerializeField]
@@ -34,7 +34,7 @@ namespace BLINDED_AM_ME
 		}
 
 		public float clippingDistance = 0.05f;
-		public ClippingOptions clippingOption = ClippingOptions.RelativeToSelf;
+		public ClippingOptions clippingOption = ClippingOptions.RelativeToObject;
 		public Vector3 clippingNormal = Vector3.forward;
 
 		protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -87,7 +87,7 @@ namespace BLINDED_AM_ME
 			var worldToCam = cam.worldToCameraMatrix;
 			switch (clippingOption)
 			{
-				case ClippingOptions.RelativeToSelf:
+				case ClippingOptions.RelativeToObject:
 					{
 						var normal = selfToWorld.MultiplyVector(-clippingNormal);
 						_clippingPlane = worldToCam.MultiplyVector(normal);
@@ -98,7 +98,7 @@ namespace BLINDED_AM_ME
 					}
 					break;
 
-				case ClippingOptions.RelativeToView:
+				case ClippingOptions.RelativeToCamera:
 					{
 						_clippingPlane = Vector3.forward;
 						_clippingPlane.w = -Vector3.Dot(

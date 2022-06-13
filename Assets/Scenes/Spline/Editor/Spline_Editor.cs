@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEditor;
-using BLINDED_AM_ME;
-using System.Threading;
 using System;
+using System.Threading;
+using System.Collections;
+using BLINDED_AM_ME;
+using BLINDED_AM_ME.Components;
 
 namespace BLINDED_AM_ME.Inspector
 {

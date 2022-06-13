@@ -14,12 +14,12 @@ using BLINDED_AM_ME.Objects;
 using UnityEditor;
 #endif
 
-namespace BLINDED_AM_ME._2D
+namespace BLINDED_AM_ME.Components
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
-	public class Spline2D : Components.Path
+	public class Spline2D : Path
 	{
 		[SerializeField]
 		[SerializeProperty(nameof(SegmentLength))]
@@ -122,7 +122,7 @@ namespace BLINDED_AM_ME._2D
 			yield return GenerateMeshTaskAsync(worldToLocal, cancellationToken)
 				.WaitForTask((generatedMesh) =>
 				{
-					GetComponent<MeshFilter>().mesh = generatedMesh.ToMesh();
+					GetComponent<MeshFilter>().mesh = generatedMesh.GetMesh();
 				});
 
 			yield return GenerateColliderCoroutine(cancellationToken);
@@ -147,14 +147,14 @@ namespace BLINDED_AM_ME._2D
 				var totalDistance = TotalDistance;
 
 				cancellationToken.ThrowIfCancellationRequested();
-				Matrix4x4 matrixA = GetMatrixFollowing(0);
+				Matrix4x4 matrixA = GetMatrix(0);
 				Matrix4x4 matrixB;
 				int i1, i2, i3, i4;
 				for (float dist = SegmentLength; dist < totalDistance + SegmentLength; dist += SegmentLength)
 				{
 					cancellationToken.ThrowIfCancellationRequested();
 
-					matrixB = GetMatrixFollowing(Math.Min(dist, totalDistance));
+					matrixB = GetMatrix(Math.Min(dist, totalDistance));
 
 					// square clockwise (bottom Left - bottom right)
 					i1 = targetMesh.AddValues(
@@ -276,7 +276,7 @@ namespace BLINDED_AM_ME._2D
 				{
 					cancellationToken.ThrowIfCancellationRequested();
 
-					matrix = GetMatrixFollowing(Math.Min(dist, totalDistance));
+					matrix = GetMatrix(Math.Min(dist, totalDistance));
 					topColliderPoints.Add(worldToLocal.MultiplyPoint3x4(matrix.MultiplyPoint3x4(colliderUp)));
 					bottomColliderPoints.Add(worldToLocal.MultiplyPoint3x4(matrix.MultiplyPoint3x4(colliderDown)));
 				}

@@ -7,14 +7,14 @@ using System.Collections.Generic;
 using BLINDED_AM_ME.Extensions;
 using BLINDED_AM_ME.Objects;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Components
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
-	public class Spline : Components.Path
+	public class Spline : Path
 	{
-		public Mesh   segmentMesh;
+		public Mesh segmentMesh;
 
 		public Spline() { }
 		
@@ -51,19 +51,19 @@ namespace BLINDED_AM_ME
 					switch (lightmapUnwrapping)
 					{
 						case LightmapUnwrapping.UseFirstUvSet:
-							GetComponent<MeshFilter>().mesh = generatedMesh.ToMesh();
+							GetComponent<MeshFilter>().mesh = generatedMesh.GetMesh();
 							break;
 						case LightmapUnwrapping.DefaultUnwrapParam:
 							GetComponent<MeshFilter>().mesh = generatedMesh.GetMesh_GenerateSecondaryUVSet();
 							break;
 						default:
-							GetComponent<MeshFilter>().mesh = generatedMesh.ToMesh();
+							GetComponent<MeshFilter>().mesh = generatedMesh.GetMesh();
 							break;
 					}
 				}
 				else
 				{
-					GetComponent<MeshFilter>().mesh = generatedMesh.ToMesh();
+					GetComponent<MeshFilter>().mesh = generatedMesh.GetMesh();
 				}
 #else
 			GetComponent<MeshFilter>().mesh = generatedMesh.GetMesh();
@@ -100,7 +100,7 @@ namespace BLINDED_AM_ME
 				}
 				segment_length = segment_MaxZ - segment_MinZ;
 
-				Matrix4x4 localToWorldA = GetMatrixFollowing(0);  //Matrix4x4.TRS(origin, Quaternion.LookRotation(forward, up), Vector3.one);
+				Matrix4x4 localToWorldA = GetMatrix(0);  //Matrix4x4.TRS(origin, Quaternion.LookRotation(forward, up), Vector3.one);
 				Matrix4x4 localToWorldB = localToWorldA;
 
 				var totalDistance = TotalDistance;
@@ -108,7 +108,7 @@ namespace BLINDED_AM_ME
 				{
 					cancellationToken.ThrowIfCancellationRequested();
 
-					localToWorldB = GetMatrixFollowing(Math.Min(dist, totalDistance));
+					localToWorldB = GetMatrix(Math.Min(dist, totalDistance));
 
 					// go through the values
 					var indexOffset = targetMesh.Vertices.Count;

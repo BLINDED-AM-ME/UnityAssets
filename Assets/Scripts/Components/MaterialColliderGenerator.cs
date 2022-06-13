@@ -5,13 +5,13 @@ using BLINDED_AM_ME.Extensions;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace BLINDED_AM_ME
+namespace BLINDED_AM_ME.Components
 {
 
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
-	public class MeshColliderPerMaterial : MonoBehaviour 
+	public class MaterialColliderGenerator : MonoBehaviour 
 	{
 		public void GenerateColliders()
 		{
@@ -39,7 +39,7 @@ namespace BLINDED_AM_ME
 				var x = new List<List<int>>() { submesh };
 				var maker = sourceMaker.ExtractSubmeshes(x);
 
-				var mesh = maker.ToMesh();
+				var mesh = maker.GetMesh();
 				if (materialEnum.MoveNext())
 					mesh.name = ((Material)materialEnum.Current).name;
 

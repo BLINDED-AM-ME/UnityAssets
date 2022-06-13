@@ -200,6 +200,7 @@ namespace BLINDED_AM_ME.Objects
         public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
 
+        // I need it to trigger the events
         [SerializeField]
         private List<T> _serializableItems = new List<T>();
         public void OnBeforeSerialize()
@@ -210,7 +211,19 @@ namespace BLINDED_AM_ME.Objects
         }
         public void OnAfterDeserialize()
         {
-            this.Match(_serializableItems);
+            // Remove
+            var deadItems = this.Where(item => !_serializableItems.Contains(item)).ToList();
+            foreach (var item in deadItems)
+                Remove(item);
+
+            // Update
+            for (var i = 0; i < _serializableItems.Count; i++)
+            {
+                if (Count <= i)
+                    Add(_serializableItems[i]);
+                else
+                    this[i] = _serializableItems[i];
+            }
         }
     
     }

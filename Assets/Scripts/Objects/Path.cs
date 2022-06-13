@@ -48,6 +48,46 @@ namespace BLINDED_AM_ME.Objects
 				return _distances[_distances.Length - 2]; // 2nd last
 		}
 
+		public Vector3 GetPoint(float distance, bool isSmooth, bool isCircuit)
+		{
+			return GetMatrixRaw(distance, isSmooth, isCircuit).MultiplyPoint3x4(Vector3.zero);
+		}
+		public Matrix4x4 GetMatrix(float distance, bool isSmooth, bool isCircuit)
+        {
+			if (Count == 0)
+				return Matrix4x4.identity;
+			else if (Count == 1)
+				return this[0];
+
+			distance = Math.Max(0.0f, distance);
+
+			var totalDistance = GetTotalDistance(isCircuit);
+
+			if (isCircuit)
+				distance %= totalDistance;
+			else
+				distance = Math.Min(distance, totalDistance);
+
+			var matrix = GetMatrixRaw(distance, isSmooth, isCircuit);
+
+			Vector3 point = matrix.MultiplyPoint3x4(Vector3.zero);
+			Vector3 forward;
+			if(totalDistance - distance >= 0.01f)
+				forward = GetPoint(distance + 0.01f, isSmooth, isCircuit) - point;
+			else
+				forward = point - GetPoint(distance - 0.01f, isSmooth, isCircuit);
+
+			forward.Normalize();
+
+			var rotation = forward == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(forward, matrix.MultiplyVector(Vector3.up));
+			if (!rotation.IsValid())
+				rotation = matrix.rotation;
+
+				return Matrix4x4.TRS(
+					point, 
+					rotation,
+					Vector3.one);
+		}
 		public Matrix4x4 GetMatrixRaw(float distance, bool isSmooth, bool isCircuit)
 		{
 			if (Count == 0)
@@ -153,73 +193,6 @@ namespace BLINDED_AM_ME.Objects
 			}
 		}
 		
-		/// <summary> Following the Path </summary>
-		/// <remarks> MultiplyVector(Vector3.forward) will point along the path</remarks>
-		/// <returns> a Matrix dependent on the up axis of nearby Matrices </returns>
-		public Matrix4x4 GetMatrixFollowing(float distance, bool isSmooth, bool isCircuit)
-        {
-			if (Count == 0)
-				return Matrix4x4.identity;
-			else if (Count == 1)
-				return this[0];
-
-			distance = Math.Max(0.0f, distance);
-
-			var totalDistance = GetTotalDistance(isCircuit);
-
-			if (isCircuit)
-				distance %= totalDistance;
-			else
-				distance = Math.Min(distance, totalDistance);
-
-			var matrix = GetMatrixRaw(distance, isSmooth, isCircuit);
-
-			Vector3 point = matrix.MultiplyPoint3x4(Vector3.zero);
-			Vector3 forward;
-			if(totalDistance - distance >= 0.01f)
-				forward = GetPoint(distance + 0.01f, isSmooth, isCircuit) - point;
-			else
-				forward = point - GetPoint(distance - 0.01f, isSmooth, isCircuit);
-
-			forward.Normalize();
-
-			var rotation = forward == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(forward, matrix.MultiplyVector(Vector3.up));
-			if (!rotation.IsValid())
-				rotation = matrix.rotation;
-
-				return Matrix4x4.TRS(
-					point, 
-					rotation,
-					Vector3.one);
-		}
-
-		public Vector3 GetPoint(float distance, bool isSmooth, bool isCircuit)
-		{
-			return GetMatrixRaw(distance, isSmooth, isCircuit).MultiplyPoint3x4(Vector3.zero);
-		}
-
-		/// <summary> Following the Path </summary>
-		/// <remarks> forward will point along the path </remarks>
-		public void GetAxesFollowing(float distance, bool isSmooth, bool isCircuit, out Vector3 origin, out Vector3 right, out Vector3 up, out Vector3 forward)
-        {
-			var matrix = GetMatrixFollowing(distance, isSmooth, isCircuit);
-
-			origin = matrix.MultiplyPoint3x4(Vector3.zero);
-			right = matrix.MultiplyVector(Vector3.right);
-			up = matrix.MultiplyVector(Vector3.up);
-			forward = Vector3.Cross(right, up);
-		}
-
-		public void GetAxesRaw(float distance, bool isSmooth, bool isCircuit, out Vector3 origin, out Vector3 right, out Vector3 up, out Vector3 forward)
-		{
-			var matrix = GetMatrixRaw(distance, isSmooth, isCircuit);
-
-			origin = matrix.MultiplyPoint3x4(Vector3.zero);
-			right = matrix.MultiplyVector(Vector3.right);
-			up = matrix.MultiplyVector(Vector3.up);
-			forward = Vector3.Cross(right, up);
-		}
-
 		Vector3 IList<Vector3>.this[int index] 
 		{ 
 			get => this[index].MultiplyPoint3x4(Vector3.zero);

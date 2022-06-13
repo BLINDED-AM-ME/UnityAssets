@@ -9,7 +9,6 @@ using UnityEngine;
 
 namespace BLINDED_AM_ME.Objects
 {
-    
     public class MeshMaker
     {
         // Mesh Values
@@ -19,26 +18,7 @@ namespace BLINDED_AM_ME.Objects
         public List<Vector4> Tangents { get; set; } = new List<Vector4>();
         public List<List<int>> Submeshes { get; set; } = new List<List<int>>();
 
-        /// <summary> Creates and returns a new mesh </summary>
-        public Mesh ToMesh()
-        {
-            Mesh shape = new Mesh();
-            shape.name = "Generated Mesh "+shape.GetInstanceID();
-            shape.SetVertices(Vertices);
-            shape.SetNormals(Normals);
-            shape.SetUVs(0, Uvs);
-            shape.SetUVs(1, Uvs);
-            shape.SetTangents(Tangents);
-            shape.subMeshCount = Submeshes.Count;
-
-            int submesh_i = 0;
-            foreach (var submesh in Submeshes)
-            {
-                shape.SetTriangles(submesh, submesh_i);
-                submesh_i++;
-            }
-            return shape;
-        }
+        
 
         /// <returns> Index </returns>
         public int AddValues(Vector3 vertex, Vector2 uv, Vector3 normal, Vector4 tangent)
@@ -258,43 +238,31 @@ namespace BLINDED_AM_ME.Objects
             });
         }
 
-        /// <summary> Adds all values and triangles from this and sourceMesh to a new instance </summary>
-        /// <returns> new MesMaker instance </returns>
-        public MeshMaker Append(MeshMaker sourceMesh, CancellationToken cancellationToken = default)
+        /// <summary> Creates and returns a new mesh </summary>
+        public Mesh GetMesh()
         {
-            return Task.Run(() => AppendAsync(sourceMesh, cancellationToken), cancellationToken).Result;
-        }
-        public Task<MeshMaker> AppendAsync(MeshMaker sourceMesh, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
+            var shape = new Mesh();
+            shape.name = "Generated Mesh "+shape.GetInstanceID();
+            shape.SetVertices(Vertices);
+            shape.SetNormals(Normals);
+            shape.SetUVs(0, Uvs);
+            shape.SetUVs(1, Uvs);
+            shape.SetTangents(Tangents);
+            shape.subMeshCount = Submeshes.Count;
 
-            return Task.Run(async () =>
+            int submesh_i = 0;
+            foreach (var submesh in Submeshes)
             {
-                // get mesh info // creates new lists
-                var meshMaker = new MeshMaker
-                {
-                    Vertices = Vertices.ToList(),
-                    Uvs = Uvs.ToList(),
-                    Normals = Normals.ToList(),
-                    Tangents = Tangents.ToList()
-                };
-
-                foreach (var submesh in Submeshes)
-                    meshMaker.Submeshes.Add(submesh.ToList());
-
-                await meshMaker.AddAsync(sourceMesh, cancellationToken);
-
-                return meshMaker;
-            });
+                shape.SetTriangles(submesh, submesh_i);
+                submesh_i++;
+            }
+            return shape;
         }
-
 #if UNITY_EDITOR
-        /// <summary>
-        /// Creates and returns a new mesh with generated lightmap uvs (Editor Only)
-        /// </summary>
+        /// <summary> Creates and returns a new mesh with generated lightmap uvs (Editor Only) </summary>
         public Mesh GetMesh_GenerateSecondaryUVSet()
         {
-            Mesh shape = ToMesh();
+            Mesh shape = GetMesh();
 
             // for light mapping
             UnityEditor.Unwrapping.GenerateSecondaryUVSet(shape);
@@ -302,12 +270,10 @@ namespace BLINDED_AM_ME.Objects
             return shape;
         }
 
-        /// <summary>
-        /// Creates and returns a new mesh with generated lightmap uvs (Editor Only)
-        /// </summary>
+        /// <summary> Creates and returns a new mesh with generated lightmap uvs (Editor Only) </summary>
         public Mesh GetMesh_GenerateSecondaryUVSet(UnityEditor.UnwrapParam param)
         {
-            Mesh shape = ToMesh();
+            Mesh shape = GetMesh();
 
             // for light mapping
             UnityEditor.Unwrapping.GenerateSecondaryUVSet(shape, param);
@@ -315,50 +281,6 @@ namespace BLINDED_AM_ME.Objects
             return shape;
         }
 #endif
-    }
-
-    /// <summary> not used but good to know </summary> 
-    public struct MeshIndexValues
-    {
-        public Vector3 Vertex { get; set; }
-        public Vector2 Uv { get; set; }
-        public Vector3 Normal { get; set; }
-        public Vector4 Tangent { get; set; }
-
-        public static bool operator ==(MeshIndexValues x, MeshIndexValues y)
-        {
-            return x.Equals(y);
-        }
-        public static bool operator !=(MeshIndexValues x, MeshIndexValues y)
-        {
-            return !x.Equals(y);
-        }
-
-        public override bool Equals(object obj)
-        {
-            //return base.Equals(obj);
-
-            if (obj is MeshIndexValues meshIndexValues
-             && Vertex == meshIndexValues.Vertex
-             && Uv == meshIndexValues.Uv
-             && Normal == meshIndexValues.Normal
-             && Tangent == meshIndexValues.Tangent)
-                return true;
-            else
-                return false;
-        }
-        public override int GetHashCode()
-        {
-            // The example displays the following output: x ^ y
-            // 5 ^ 8 = 13
-            // 8 ^ 5 = 13
-
-            // Tuple.Create(x, y).GetHashCode(); may significantly impact the overall performance
-            // 5, 8 = 173
-            // 8, 5 = 269
-
-            return base.GetHashCode();
-        }
     }
 
 }

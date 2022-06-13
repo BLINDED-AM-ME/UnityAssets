@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/BlendFiles/BlendFile_objects.unity
+    path: Assets/Meshes/BlendFiles/BlendFile_objects.unity
     guid: 95f86fb55e9894a87959cac39e86854d
   - enabled: 1
     path: Assets/BLINDED_AM_ME package/Scenes/Burn_Through.unity
@@ -24,33 +24,33 @@ EditorBuildSettings:
     path: Assets/_Private/Lightning/Lightning - Click Play.unity
     guid: 0b559f7bc53584d9da78c4452b74ae9a
   - enabled: 1
-    path: Assets/MeshCut/MeshCut.unity
+    path: Assets/Scenes/MeshCut/MeshCut.unity
     guid: 11d928b7f36024f079bef9251b5cdca5
   - enabled: 1
-    path: Assets/MeshColliderPerMaterial/MeshColliderPerMaterial.unity
+    path: Assets/Scenes/MaterialColliderGenerator.unity
     guid: 839acc62e9c074d9cb16dfcd946321d6
   - enabled: 1
     path: Assets/2D/ParallaxEffect/Parallax2D background.unity
     guid: 1d70442b5d7ad4ad68b7ccc19b4abf6b
   - enabled: 1
-    path: Assets/2D/ParallaxEffect/Parallax2D_box.unity
+    path: Assets/Scenes/Parallax2D/Parallax2D_box.unity
     guid: fff13ccc0e51549ffb87f06432b126e2
   - enabled: 1
-    path: Assets/Particles/Particles.unity
+    path: Assets/Scenes/ParticlePathFlow.unity
     guid: 0a9ba26a50123444b9379a9aefa64780
   - enabled: 1
     path: Assets/Particles/ParticleTexture.unity
     guid: 71c395ded1004448eab4520c528af76c
   - enabled: 1
-    path: Assets/Portals/Portal.unity
+    path: Assets/Scenes/Portals/Portal.unity
     guid: b740043a9f0474d51aad49057ff54b00
   - enabled: 1
     path: Assets/BLINDED_AM_ME package/Scenes/Save_Data.unity
     guid: e97b9f1769b88417590f222f3eb5095d
   - enabled: 1
-    path: Assets/2D/Spline/Spline2D.unity
+    path: Assets/Scenes/Spline2D/Spline2D.unity
     guid: 5d91f16760e7b4f4897b4f6c9cb549b0
   - enabled: 1
-    path: Assets/Spline/Spline.unity
+    path: Assets/Scenes/Spline/Spline.unity
     guid: 12a724064c20e4f7495385e1e5a2f7cc
   m_configObjects: {}

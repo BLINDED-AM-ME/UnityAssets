@@ -116,28 +116,14 @@ namespace BLINDED_AM_ME.Components
 		{
 			return PathObject.GetPoint(distance, IsSmooth, IsCircuit);
 		}
-		/// <summary> Following the Path </summary>
-		/// <remarks> MultiplyVector(Vector3.forward) will point along the path</remarks>
-		/// <returns> a Matrix dependent on the up axis of nearby Matrices </returns>
-		public Matrix4x4 GetMatrixFollowing(float distance)
+		public Matrix4x4 GetMatrix(float distance)
         {
-			return PathObject.GetMatrixFollowing(distance, IsSmooth, IsCircuit);
+			return PathObject.GetMatrix(distance, IsSmooth, IsCircuit);
         }
-		/// <returns> A fully blended Matrix </returns>
 		public Matrix4x4 GetMatrixRaw(float distance)
         {
 			return PathObject.GetMatrixRaw(distance, IsSmooth, IsCircuit);
         }
-		/// <summary> Following the Path </summary>
-		/// <remarks> forward will point along the path </remarks>
-		public void GetAxesFollowing(float distance, out Vector3 origin, out Vector3 right, out Vector3 up, out Vector3 forward)
-		{
-			PathObject.GetAxesFollowing(distance, IsSmooth, IsCircuit, out origin, out right, out up, out forward);
-		}
-		public void GetAxesRaw(float distance, out Vector3 origin, out Vector3 right, out Vector3 up, out Vector3 forward)
-		{
-			PathObject.GetAxesRaw(distance, IsSmooth, IsCircuit, out origin, out right, out up, out forward);
-		}
 
 #if UNITY_EDITOR
 
@@ -220,12 +206,12 @@ namespace BLINDED_AM_ME.Components
 		}
 		private Vector3 Gizmo_DrawAxes(float dist, bool isSelected)
 		{
-			GetAxesFollowing(dist, out Vector3 origin, out Vector3 right, out Vector3 up, out Vector3 forward);
-
+			var matrix = GetMatrix(dist);
+			var origin = matrix.MultiplyPoint3x4(Vector3.zero);
 			Gizmos.color = isSelected ? Color.green : new Color(0, 1, 0, 0.5f);
-			Gizmos.DrawRay(origin, up * gizmoLineSize);
+			Gizmos.DrawRay(origin, matrix.MultiplyVector(Vector3.up) * gizmoLineSize);
 			Gizmos.color = isSelected ? Color.red : new Color(1, 0, 0, 0.5f);
-			Gizmos.DrawRay(origin, right * gizmoLineSize);
+			Gizmos.DrawRay(origin, matrix.MultiplyVector(Vector3.right) * gizmoLineSize);
 
 			return origin;
 		}
