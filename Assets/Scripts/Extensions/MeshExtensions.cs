@@ -54,7 +54,7 @@ namespace BLINDED_AM_ME.Extensions
         }
         
         /// <summary> Call and Wait on UI Thread </summary>
-        public static IEnumerator CutCoroutine(this Mesh mesh, Plane blade, Action<Tuple<Mesh, Mesh>> callback, int capSubMeshIndex = 0, CancellationToken cancellationToken = default)
+        public static IEnumerator CutCoroutine(this Mesh mesh, Plane blade, Action<Tuple<Mesh, Mesh>> callback = null, int capSubMeshIndex = 0, CancellationToken cancellationToken = default)
         {
             // this has to be done on UI thread
             var maker = mesh.ToMeshMaker();
@@ -73,7 +73,7 @@ namespace BLINDED_AM_ME.Extensions
                 Mesh right_HalfMesh = pieces.Item2.GetMesh();
                 right_HalfMesh.name = "Split Mesh Right";
 
-                callback.Invoke(new Tuple<Mesh, Mesh>(left_HalfMesh, right_HalfMesh));
+                callback?.Invoke(new Tuple<Mesh, Mesh>(left_HalfMesh, right_HalfMesh));
             });
         }
 

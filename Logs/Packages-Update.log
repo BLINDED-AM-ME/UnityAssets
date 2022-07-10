@@ -112,3 +112,15 @@ The following packages were updated:
   com.unity.timeline from version 1.4.8 to 1.6.4
 The following packages were removed:
   com.unity.multiplayer-hlapi@1.0.8
+
+=== Sun Jul 10 16:13:05 2022
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.collab-proxy from version 1.15.16 to 1.15.18
+  com.unity.ide.rider from version 3.0.13 to 3.0.15
+  com.unity.ide.visualstudio from version 2.0.15 to 2.0.16
+  com.unity.render-pipelines.universal from version 12.1.6 to 12.1.7
+  com.unity.shadergraph from version 12.1.6 to 12.1.7

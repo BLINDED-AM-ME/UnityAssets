@@ -156,9 +156,9 @@ namespace BLINDED_AM_ME
 					leftSide.name = "LeftSide";
 					leftMeshFilter.mesh = pieces.Item1;
 					leftMeshRenderer.sharedMaterials = materials.ToArray();
-				//leftMeshRenderer.materials = materials.ToArray();
+					//leftMeshRenderer.materials = materials.ToArray();
 
-				var rightSide = new GameObject("RightSide");
+					var rightSide = new GameObject("RightSide");
 					var rightMeshFilter = rightSide.AddComponent<MeshFilter>();
 					var rightMeshRenderer = rightSide.AddComponent<MeshRenderer>();
 
@@ -167,13 +167,13 @@ namespace BLINDED_AM_ME
 
 					rightMeshFilter.mesh = pieces.Item2;
 					rightMeshRenderer.sharedMaterials = materials.ToArray();
-				//rightMeshRenderer.materials = materials.ToArray();
+					//rightMeshRenderer.materials = materials.ToArray();
 
-				// Physics 
-				Destroy(leftSide.GetComponent<Collider>());
+					// Physics 
+					Destroy(leftSide.GetComponent<Collider>());
 
-				// Replace
-				var leftCollider = leftSide.AddComponent<MeshCollider>();
+					// Replace
+					var leftCollider = leftSide.AddComponent<MeshCollider>();
 					leftCollider.convex = true;
 					leftCollider.sharedMesh = pieces.Item1;
 
@@ -181,8 +181,8 @@ namespace BLINDED_AM_ME
 					rightCollider.convex = true;
 					rightCollider.sharedMesh = pieces.Item2;
 
-				// rigidbody
-				if (!leftSide.GetComponent<Rigidbody>())
+					// rigidbody
+					if (!leftSide.GetComponent<Rigidbody>())
 						leftSide.AddComponent<Rigidbody>();
 
 					if (!rightSide.GetComponent<Rigidbody>())
