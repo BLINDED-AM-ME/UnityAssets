@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
 using BLINDED_AM_ME.Extensions;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -17,15 +18,14 @@ namespace BLINDED_AM_ME.Components
 	/// <summary> I want to use Overrides and Properties </summary>
 	public class MonoBehaviour2 : MonoBehaviour, INotifyPropertyChanged
 	{
-		[HideInInspector]
-		[SerializeField]
-		[SerializeProperty(nameof(Id))]
-		private string _id;
-		public string Id
-		{
-			get => _id;
-			set => SetProperty(ref _id, value);
-		}
+		//[SerializeField]
+		//[SerializeProperty(nameof(Id))]
+		//private string _id;
+		//public string Id
+		//{
+		//	get => _id;
+		//	set => SetProperty(ref _id, value);
+		//}
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
